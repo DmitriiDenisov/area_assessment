@@ -80,14 +80,15 @@ def patches2array_overlap(patches, img_size, patch_size=(64, 64), step_size=64, 
     print('patches2array_overlap: img_size: {}'.format(img_size))
     patches_in_row = (img_size[1] - patch_size[1]) // step_size + 1
     patches_in_col = (img_size[0] - patch_size[0]) // step_size + 1
+    print('patches_in_row: {}, patches_in_col: {}'.format(patches_in_row, patches_in_col))
     arr = np.empty(img_size)
     print('patches2array_overlap: patches.shape: {}'.format(patches.shape))
     print('patches2array_overlap: arr.shape: {}'.format(arr.shape))
     for i in range(patches_in_col):
-        print('patches2array_overlap: row {}'.format(i))
+        print('patches2array_overlap: row {}/{}'.format(i, patches_in_col))
         for j in range(patches_in_row):
             arr2 = np.empty(img_size)
-            patch_ij = patches[i * patches_in_row + j,
+            patch_ij = patches[i * patches_in_col + j,
                        patch_size[0]//2 - subpatch_size[0] // 2:patch_size[0] // 2 + subpatch_size[0] // 2,
                        patch_size[1]//2 - subpatch_size[1] // 2:patch_size[1] // 2 + subpatch_size[1] // 2]
             arr2[i*step_size:i*step_size + subpatch_size[0], j * step_size:j * step_size + subpatch_size[1]] = patch_ij
