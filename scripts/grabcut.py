@@ -113,7 +113,7 @@ if __name__ == '__main__':
         print("Correct Usage: python grabcut.py <filename> \n")
         filename = '../data/lena.jpg'
 
-    img = cv2.imread(filename)
+    img = cv2.imread(filename)[:600, :600, :600]
     img2 = img.copy()  # a copy of original image
     mask = np.zeros(img.shape[:2], dtype=np.uint8)  # mask initialized to PR_BG
     output = np.zeros(img.shape, np.uint8)  # output image to be shown

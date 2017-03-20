@@ -30,7 +30,7 @@ def cnn_v1():
     return model
 
 
-def cnn_v2():
+def cnn_v3():
     """
     cnn architecture from
     Article: "Multiple Object Extraction from Aerial Imagery with Convolutional Neural Networks" by
@@ -48,8 +48,8 @@ def cnn_v2():
 
     model.add(Flatten())
     model.add(Dense(64 ** 2, activation='sigmoid'))
-    model.add(Dense(32 ** 2, activation='sigmoid'))
-    model.add(Reshape((32, 32)))
+    model.add(Dense(16 ** 2, activation='sigmoid'))
+    model.add(Reshape((16, 16)))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 

@@ -22,12 +22,12 @@ def array2patches(arr, patch_size=(64, 64), step_size=64):
     Extraction of PATCHES FROM IMAGE of shape (x, y, ...) with sliding window.
     Sliding window runs from left upper corner to right bottom corner.
     If step size coincides with patch size height or width there are no overlapping patches.
-    Otherwise, there is overlapping, for example horizontal overlap = (patch_size[1] - step_size).
+    Otherwise, there is overlapping, for example horizontal overlap = (nn_input_patch_size[1] - step_size).
 
     :param arr: numpy array (representation of image) with shape (x, y, ...)
     :param patch_size: tuple (height, width) of sliding window (patch)
     :param step_size: integer, indicates how many pixels are skipped in both the (x, y) direction
-    :return: numpy array of shape ((arr.shape[0]-patch.shape[0])//step_size + 1, patch_size[0], patch_size[1], ...)
+    :return: numpy array of shape ((arr.shape[0]-patch.shape[0])//step_size + 1, nn_input_patch_size[0], nn_input_patch_size[1], ...)
     """
 
     return np.array([arr[i: i + patch_size[0], j: j + patch_size[1]]
@@ -43,7 +43,7 @@ def patches2array2(patches, img_size, patch_size=(64, 64), step_size=64):
     It is needed to reduce noise on edges of patch.
     Next sub-patches are concatenated into rows and then rows construct output array (image).
 
-    :param patches: numpy array of shape (number of patches, patch_size[0], patch_size[1])
+    :param patches: numpy array of shape (number of patches, nn_input_patch_size[0], nn_input_patch_size[1])
     :param img_size: tuple (height, width) of image from which patches were generated
     :param patch_size: tuple (height, width) of sliding window (patch)
     :param step_size: should be the same step_size as the step_size during creation of the patches
@@ -65,12 +65,12 @@ def patches2array2(patches, img_size, patch_size=(64, 64), step_size=64):
 def patches2array_overlap(patches, img_size, patch_size=(64, 64), step_size=64, subpatch_size=(32, 32)):
     """
     Conversion of PATCHES of one image back TO IMAGE WITH OVERLAPPING.
-    From every patch the central sub-patch of size subpatch_size is taken and settled into corresponding place into
+    From every patch the central sub-patch of size nn_output_patch_size is taken and settled into corresponding place into
     layer of shape img_size.
     Next, layers are summarized iteratively - one with the previous one.
     Less step_size increases resolution of the image - more layers influence on one pixel at the output image.
 
-    :param patches: numpy array of shape (number of patches, patch_size[0], patch_size[1])
+    :param patches: numpy array of shape (number of patches, nn_input_patch_size[0], nn_input_patch_size[1])
     :param img_size: tuple (height, width) of image from which patches were generated
     :param patch_size: tuple (height, width) of sliding window (patch)
     :param step_size: should be the same step_size as the step_size during creation of the patches
@@ -78,8 +78,8 @@ def patches2array_overlap(patches, img_size, patch_size=(64, 64), step_size=64, 
     :return: numpy array of shape (x, y, ...)
     """
     print('patches2array_overlap: img_size: {}'.format(img_size))
-    patches_in_row = (img_size[1] - patch_size[1]) // step_size + 1
-    patches_in_col = (img_size[0] - patch_size[0]) // step_size + 1
+    patches_in_row = (img_size[1] - patch_size[1]) // step_size #+ 1
+    patches_in_col = (img_size[0] - patch_size[0]) // step_size #+ 1
     print('patches_in_row: {}, patches_in_col: {}'.format(patches_in_row, patches_in_col))
     arr = np.empty(img_size)
     print('patches2array_overlap: patches.shape: {}'.format(patches.shape))
@@ -88,10 +88,46 @@ def patches2array_overlap(patches, img_size, patch_size=(64, 64), step_size=64, 
         print('patches2array_overlap: row {}/{}'.format(i, patches_in_col))
         for j in range(patches_in_row):
             arr2 = np.empty(img_size)
+            print(patch_size[0]//2 - subpatch_size[0]//2, patch_size[0]//2 + subpatch_size[0]//2)
             patch_ij = patches[i * patches_in_col + j,
-                       patch_size[0]//2 - subpatch_size[0] // 2:patch_size[0] // 2 + subpatch_size[0] // 2,
-                       patch_size[1]//2 - subpatch_size[1] // 2:patch_size[1] // 2 + subpatch_size[1] // 2]
+                       patch_size[0]//2 - subpatch_size[0]//2:patch_size[0]//2 + subpatch_size[0]//2,
+                       patch_size[1]//2 - subpatch_size[1]//2:patch_size[1]//2 + subpatch_size[1]//2]
+            # print('patch_ij.shape: {}'.format(patch_ij.shape))
             arr2[i*step_size:i*step_size + subpatch_size[0], j * step_size:j * step_size + subpatch_size[1]] = patch_ij
             # print('patches2array_overlap: {}, {}'.format(i, j))
+            arr += arr2
+    return arr
+
+
+def patches2array(patches, img_size, nn_input_patch_size=(64, 64), nn_output_patch_size=(16, 16), step_size=4):
+    """
+    Conversion of PATCHES of one image back TO IMAGE WITH OVERLAPPING.
+
+
+    :param patches: numpy array of shape (number of patches, nn_input_patch_size[0], nn_input_patch_size[1])
+    :param img_size: tuple (height, width) of image from which patches were generated
+    :param nn_input_patch_size: tuple (height, width) of sliding window (patch)
+    :param step_size: should be the same step_size as the step_size during creation of the patches
+    :param nn_output_patch_size: size of subpatch
+    :return: numpy array of shape (x, y, ...)
+    """
+    print('patches2array_overlap: img_size: {}'.format(img_size))
+    patches_in_row = (img_size[1] - nn_input_patch_size[0]) // step_size #+ 1
+    patches_in_col = (img_size[0] - nn_input_patch_size[0]) // step_size #+ 1
+    print('patches_in_row: {}, patches_in_col: {}'.format(patches_in_row, patches_in_col))
+    arr = np.empty(img_size)
+    print('patches2array_overlap: patches.shape: {}'.format(patches.shape))
+    print('patches2array_overlap: arr.shape: {}'.format(arr.shape))
+    margin_hor = (nn_input_patch_size[0]-nn_output_patch_size[0])//2
+    margin_vert = (nn_input_patch_size[1]-nn_output_patch_size[1])//2
+    for i in range(patches_in_col):
+        print('patches2array_overlap: row {}/{}'.format(i, patches_in_col))
+        for j in range(patches_in_row):
+            arr2 = np.empty(img_size)
+            patch_ij = patches[i * patches_in_col + j, :, :]
+            print('patch_ij.shape: {}'.format(patch_ij.shape))
+            arr2[margin_hor+i*step_size:margin_hor+i*step_size+nn_output_patch_size[0],
+                 margin_vert+j*step_size:margin_vert+j*step_size+nn_output_patch_size[1]] = patch_ij
+            print('patches2array_overlap: {}, {}'.format(i, j))
             arr += arr2
     return arr
