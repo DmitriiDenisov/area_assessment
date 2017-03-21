@@ -2,9 +2,16 @@ import numpy as np
 import cv2
 from collections import defaultdict
 from shapely.geometry import Polygon, MultiPolygon
+from descartes import PolygonPatch
+from gdal import ogr, osr
+import matplotlib; matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+from matplotlib.collections import PatchCollection
 
 
-def mask_to_polygons(mask, epsilon=5, min_area=1.):
+def mask_to_polygons(mask, epsilon=5, min_area=.1):
+    horiz_axis = float(mask.shape[0] - 1) / 2
+    vert_axis = float(mask.shape[1] - 1) / 2
     # first, find contours with cv2: it's much faster than shapely
     image, contours, hierarchy = cv2.findContours(
         ((mask == 1) * 255).astype(np.uint8),
@@ -28,6 +35,9 @@ def mask_to_polygons(mask, epsilon=5, min_area=1.):
     for idx, cnt in enumerate(approx_contours):
         if idx not in child_contours and cv2.contourArea(cnt) >= min_area:
             assert cnt.shape[1] == 1
+            x_coord = cnt[:, 0, 0]
+            y_coord = cnt[:, 0, 1]
+            cnt[:, 0, 1] = 2 * vert_axis - y_coord
             poly = Polygon(
                 shell=cnt[:, 0, :],
                 holes=[c[:, 0, :] for c in cnt_children.get(idx, [])
@@ -42,3 +52,61 @@ def mask_to_polygons(mask, epsilon=5, min_area=1.):
         if all_polygons.type == 'Polygon':
             all_polygons = MultiPolygon([all_polygons])
     return all_polygons
+
+
+def plot_polygons(mp, pname):
+
+    cm = plt.get_cmap('RdBu')
+    num_colours = len(mp)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    minx, miny, maxx, maxy = mp.bounds
+    w, h = maxx - minx, maxy - miny
+    ax.set_xlim(minx - 0.2 * w, maxx + 0.2 * w)
+    ax.set_ylim(miny - 0.2 * h, maxy + 0.2 * h)
+    ax.set_aspect(1)
+
+    patches = []
+    for idx, p in enumerate(mp):
+        colour = cm(1. * idx / num_colours)
+        patches.append(PolygonPatch(p, fc=colour, ec='#555555', lw=0.2, alpha=1., zorder=1))
+    ax.add_collection(PatchCollection(patches, match_original=True))
+    ax.set_xticks([])
+    ax.set_yticks([])
+    plt.title("Shapely polygons rendered using Shapely")
+    plt.tight_layout()
+    plt.savefig('../../data/output/{}.png'.format(pname), alpha=True, dpi=300)
+    plt.show()
+
+
+def save_polygons(poly, fname, meta=None):
+
+    driver = ogr.GetDriverByName('Esri Shapefile')
+    ds = driver.CreateDataSource('../../data/output/{}.shp'.format(fname))
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(4326)
+
+    layer = ds.CreateLayer('', srs, ogr.wkbMultiPolygon)
+
+    # Add one attribute
+    layer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger))
+    defn = layer.GetLayerDefn()
+
+    ## If there are multiple geometries, put the "for" loop here
+
+    # Create a new feature (attribute and geometry)
+    feat = ogr.Feature(defn)
+    feat.SetField('id', 123)
+
+    # Make a geometry, from Shapely object
+    geom = ogr.CreateGeometryFromWkb(poly.wkb)
+    feat.SetGeometry(geom)
+
+    layer.CreateFeature(feat)
+
+    feat = geom = None  # destroy these
+
+    # Save and close everything
+    ds = layer = feat = geom = None
+
