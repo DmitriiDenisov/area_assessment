@@ -2,12 +2,14 @@ import numpy as np
 import cv2
 from os import listdir
 from os.path import isfile, join
+import sys
+sys.path.append('../area_assesment/images_processing/')
 from polygons import mask_to_polygons, plot_polygons, save_polygons
 import gdal
 from gdal import ogr, osr
 
 
-path = '../../data/maps'
+path = '../data/maps'
 files = [f for f in listdir(path) if isfile(join(path, f))]
 nfiles = len(files)
 poly = list(range(nfiles))

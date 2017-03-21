@@ -76,14 +76,14 @@ def plot_polygons(mp, pname):
     ax.set_yticks([])
     plt.title("Shapely polygons rendered using Shapely")
     plt.tight_layout()
-    plt.savefig('../../data/output/{}.png'.format(pname), alpha=True, dpi=300)
+    plt.savefig('../data/output/{}.png'.format(pname), alpha=True, dpi=300)
     plt.show()
 
 
 def save_polygons(poly, fname, meta=None):
 
     driver = ogr.GetDriverByName('Esri Shapefile')
-    ds = driver.CreateDataSource('../../data/output/{}.shp'.format(fname))
+    ds = driver.CreateDataSource('../data/output/{}.shp'.format(fname))
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(4326)
 
