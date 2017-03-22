@@ -27,8 +27,8 @@ net_weights_version = 10  # use previous weights
 dir_train = '../../sakaka_data/train/'  # '../../data/mass_buildings/train/'
 dir_train_sat = dir_train + 'sat/'
 dir_train_map = dir_train + 'map/'
-train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')[2:3]
-train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')[2:3]
+train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')[1:]
+train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')[1:]
 
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1]))

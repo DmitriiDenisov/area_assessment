@@ -6,7 +6,7 @@ def plot_img(img, name=None, show_plot=True, save_output_path=None):
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
-    ax.imshow(img)
+    ax.imshow(img, cmap='viridis')
     if show_plot:
         plt.show()
     if save_output_path:
