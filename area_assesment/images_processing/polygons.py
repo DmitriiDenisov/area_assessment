@@ -62,9 +62,11 @@ def plot_polygons(mp, pname):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     minx, miny, maxx, maxy = mp.bounds
-    w, h = maxx - minx, maxy - miny
-    ax.set_xlim(minx - 0.2 * w, maxx + 0.2 * w)
-    ax.set_ylim(miny - 0.2 * h, maxy + 0.2 * h)
+    # w, h = maxx - minx, maxy - miny
+    # ax.set_xlim(minx - 0.2 * w, maxx + 0.2 * w)
+    # ax.set_ylim(miny - 0.2 * h, maxy + 0.2 * h)
+    ax.set_xlim(minx, maxx)
+    ax.set_ylim(miny, maxy)
     ax.set_aspect(1)
 
     patches = []
@@ -109,4 +111,32 @@ def save_polygons(poly, fname, meta=None):
 
     # Save and close everything
     ds = layer = feat = geom = None
+
+
+def contours_to_polygons(contour_list, shapes, tolerance=0.2):
+    n = len(contour_list)
+    polygon_list = list(range(n))
+    for i in range(n):
+        print('Polygons from contours. Image #{i} out of {n}'.format(i=i + 1, n=n))
+        polygon_list[i] = []
+        vert_axis = float(shapes[i][1] - 1) / 2
+        for cnt in contour_list[i]:
+            y_coord = cnt[:, 0, 1]
+            cnt[:, 0, 1] = 2 * vert_axis - y_coord
+            try:
+                if tolerance > 0:
+                    polygon_list[i].append(Polygon(shell=cnt[:, 0, :]).simplify(tolerance, preserve_topology=True))
+                else:
+                    polygon_list[i].append(Polygon(shell=cnt[:, 0, :]))
+            except ValueError:
+                i = i
+        # approximating polygons might have created invalid ones, fix them
+        polygon_list[i] = MultiPolygon(polygon_list[i])
+        if not polygon_list[i].is_valid:
+            polygon_list[i] = polygon_list[i].buffer(0)
+            # Sometimes buffer() converts a simple Multipolygon to just a Polygon,
+            # need to keep it a Multi throughout
+            if polygon_list[i].type == 'Polygon':
+                polygon_list[i] = MultiPolygon([polygon_list[i]])
+    return polygon_list
 
