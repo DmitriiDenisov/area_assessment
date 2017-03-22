@@ -2,36 +2,34 @@ import matplotlib.pyplot as plt
 
 
 def plot_img(img, name=None, show_plot=True, save_output_path=None):
-    fig = plt.figure(frameon=False)
+    fig = plt.figure(frameon=False, figsize=(10, 10))
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
-    ax.imshow(img, aspect='normal')
-    if name:
-        plt.suptitle(name)
+    ax.imshow(img)
     if show_plot:
         plt.show()
     if save_output_path:
         filename = save_output_path + name + '.png'
         print('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=500)
+        plt.savefig(filename)
 
 
-def plot_img_mask(img, mask, name=None, overlay=False, show_plot=True, save_output_path=None):
+def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=True, save_output_path=None):
     if overlay:
-        fig = plt.figure(frameon=False)
+        fig = plt.figure(frameon=False, figsize=(10, 10))
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()
         fig.add_axes(ax)
-        ax.imshow(img, aspect='normal')
-        ax.imshow(mask, alpha=.8, aspect='normal')
+        ax.imshow(img)
+        ax.imshow(mask, alpha=alpha)
     else:
         fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(10, 10))
         ax[0].imshow(img), ax[0].set_title('image'), ax[0].axis('off')
         ax[1].imshow(mask), ax[1].set_title('mask'), ax[1].axis('off')
         plt.tight_layout()
-    if name:
-        plt.suptitle(name)
+        if name:
+            plt.suptitle(name)
     if show_plot:
         plt.show()
     if save_output_path:

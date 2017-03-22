@@ -7,7 +7,7 @@ def array2patches_sklearn(arr, patch_size=(64, 64)):
     Extraction of patches using sklearn function.
 
     img_sat = plt.imread(image_filepath)
-    img_sat_patches = extract_patches_2d(img_sat, (64, 64), max_patches=1000, random_state=1)
+    sat_patches = extract_patches_2d(img_sat, (64, 64), max_patches=1000, random_state=1)
 
     :param arr: numpy array representation of image with shape (x, y, ...)
     :param patch_size:
@@ -112,8 +112,8 @@ def patches2array(patches, img_size, nn_input_patch_size=(64, 64), nn_output_pat
     :return: numpy array of shape (x, y, ...)
     """
     print('patches2array_overlap: img_size: {}'.format(img_size))
-    patches_in_row = (img_size[1] - nn_input_patch_size[0]) // step_size #+ 1
-    patches_in_col = (img_size[0] - nn_input_patch_size[0]) // step_size #+ 1
+    patches_in_row = (img_size[1] - nn_input_patch_size[0]) // step_size  # + 1
+    patches_in_col = (img_size[0] - nn_input_patch_size[0]) // step_size
     print('patches_in_row: {}, patches_in_col: {}'.format(patches_in_row, patches_in_col))
     arr = np.empty(img_size)
     print('patches2array_overlap: patches.shape: {}'.format(patches.shape))
@@ -123,11 +123,11 @@ def patches2array(patches, img_size, nn_input_patch_size=(64, 64), nn_output_pat
     for i in range(patches_in_col):
         print('patches2array_overlap: row {}/{}'.format(i, patches_in_col))
         for j in range(patches_in_row):
+            # print('patches2array_overlap: {}, {}'.format(i, j))
             arr2 = np.empty(img_size)
             patch_ij = patches[i * patches_in_col + j, :, :]
-            print('patch_ij.shape: {}'.format(patch_ij.shape))
+            # print('patch_ij.shape: {}'.format(patch_ij.shape))
             arr2[margin_hor+i*step_size:margin_hor+i*step_size+nn_output_patch_size[0],
                  margin_vert+j*step_size:margin_vert+j*step_size+nn_output_patch_size[1]] = patch_ij
-            print('patches2array_overlap: {}, {}'.format(i, j))
             arr += arr2
     return arr
