@@ -42,9 +42,10 @@ for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.p
     mask = cv2.imread(cur_file_path, cv2.IMREAD_GRAYSCALE)
     if mask is None:
         continue
-    mask[mask > 0] = 1
+    mask[mask < 127] = 0
+    mask[mask >= 127] = 1
 
-    image_polygons = mask_to_polygons(mask)
+    image_polygons = mask_to_polygons(mask, epsilon=1, min_area=0.02)
 
     gdal_ds = gdal.Open(cur_file_path, GA_ReadOnly)
     top_left_x = gdal_ds.GetGeoTransform()[0]
