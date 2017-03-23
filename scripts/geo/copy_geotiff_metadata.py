@@ -1,9 +1,9 @@
 import argparse
 import glob
 import os
-
 import gdal
 from gdalconst import GA_Update
+import sys
 
 parser = argparse.ArgumentParser(description='Copies metadata from GeoTIFFs in one folder to GeoTIFFs in another'
                                              'with the same filename.')
@@ -14,9 +14,12 @@ parser.add_argument('dest_dir', metavar='dest_dir', type=str,
 parser.add_argument('-v', '--verbose', dest='v', action='store_const',
                     const=True, default=False,
                     help='print the processing details')
-parser.print_help()
 
-args = parser.parse_args()
+try:
+    args = parser.parse_args()
+except:
+    parser.print_help()
+    sys.exit(0)
 
 src_dir = os.path.normpath(args.src_dir)
 dst_dir = os.path.normpath(args.dest_dir)
