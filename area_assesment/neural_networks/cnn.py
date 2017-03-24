@@ -47,7 +47,30 @@ def cnn_v3():
     model.add(Conv2D(filters=80, kernel_size=3, strides=1, activation='relu'))
 
     model.add(Flatten())
-    model.add(Dense(64 ** 2, activation='sigmoid'))
+    model.add(Dense(64 ** 2, activation='relu'))
+    model.add(Dense(16 ** 2, activation='sigmoid'))
+    model.add(Reshape((16, 16)))
+    model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    return model
+
+
+def cnn_v4():
+    model = Sequential()
+    model.add(BatchNormalization(input_shape=(64, 64, 3)))
+    model.add(Conv2D(filters=64, kernel_size=4, strides=4, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=1))
+    # model.add(BatchNormalization())
+    model.add(Conv2D(filters=128, kernel_size=4, strides=1, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=1))
+    # model.add(BatchNormalization())
+    model.add(Conv2D(filters=256, kernel_size=2, strides=1, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=1))
+    # model.add(BatchNormalization())
+    model.add(Conv2D(filters=128, kernel_size=2, strides=1, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=1))
+
+    model.add(Flatten())
+    # model.add(Dense(64 ** 2, activation='relu'))
     model.add(Dense(16 ** 2, activation='sigmoid'))
     model.add(Reshape((16, 16)))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -58,6 +81,6 @@ def baseline_model():
     model = Sequential()
     model.add(Flatten(input_shape=(64, 64, 3), activation='relu'))
     model.add(Dense(64**2, activation='sigmoid'))
-    model.add(Reshape((64, 64)))
+    model.add(Reshape((16, 16)))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model

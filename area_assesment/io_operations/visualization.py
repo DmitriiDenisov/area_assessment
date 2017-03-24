@@ -22,7 +22,7 @@ def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=True,
         ax.set_axis_off()
         fig.add_axes(ax)
         ax.imshow(img)
-        ax.imshow(mask, alpha=alpha)
+        ax.imshow(mask, alpha=alpha, cmap='viridis')
     else:
         fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(10, 10))
         ax[0].imshow(img), ax[0].set_title('image'), ax[0].axis('off')

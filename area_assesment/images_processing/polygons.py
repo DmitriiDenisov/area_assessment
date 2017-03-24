@@ -54,7 +54,7 @@ def mask_to_polygons(mask, epsilon=5, min_area=.1):
     return all_polygons
 
 
-def plot_polygons(mp, pname):
+def plot_polygons(mp, pname, output_folder):
 
     cm = plt.get_cmap('RdBu')
     num_colours = len(mp)
@@ -78,14 +78,14 @@ def plot_polygons(mp, pname):
     ax.set_yticks([])
     plt.title("Shapely polygons rendered using Shapely")
     plt.tight_layout()
-    plt.savefig('../data/output/{}.png'.format(pname), alpha=True, dpi=300)
+    plt.savefig(output_folder+'{}'.format(pname), alpha=True, dpi=500)
     plt.show()
 
 
-def save_polygons(poly, fname, meta=None):
+def save_polygons(poly, output_folder, fname, meta=None):
 
     driver = ogr.GetDriverByName('Esri Shapefile')
-    ds = driver.CreateDataSource('../data/output/{}.shp'.format(fname))
+    ds = driver.CreateDataSource(output_folder+'{}.shp'.format(fname))
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(4326)
 

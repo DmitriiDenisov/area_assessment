@@ -4,7 +4,7 @@ from os import listdir
 from os.path import isfile, join
 
 
-def convex_contours(folder_in='../data/heatmaps', folder_out='../data/maps', min_area=10, cutoff=30):
+def convex_contours(folder_in, folder_out, min_area=10, cutoff=30):
 
     files = [f for f in listdir(folder_in) if isfile(join(folder_in, f))]
     nfiles = len(files)
