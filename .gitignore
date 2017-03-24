@@ -1,2 +1,4 @@
 .idea/
-data
+data/*
+!data/test
+data/test/res_artifacts/*
