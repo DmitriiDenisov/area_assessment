@@ -4,7 +4,7 @@ import logging
 # matplotlib.use('Agg')
 
 
-def plot_img(img, name=None, show_plot=True, save_output_path=None):
+def plot_img(img, name=None, show_plot=False, save_output_path=None):
     fig = plt.figure(frameon=False, figsize=(10, 10))
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
@@ -15,10 +15,10 @@ def plot_img(img, name=None, show_plot=True, save_output_path=None):
     if save_output_path:
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename)
+        plt.savefig(filename, dpi=600)
 
 
-def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=True, save_output_path=None):
+def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_output_path=None):
     if overlay:
         fig = plt.figure(frameon=False, figsize=(10, 10))
         ax = plt.Axes(fig, [0., 0., 1., 1.])
@@ -38,10 +38,10 @@ def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=True,
     if save_output_path:
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=500)
+        plt.savefig(filename, dpi=600)
 
 
-def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=True, save_output_path=None):
+def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=False, save_output_path=None):
     """
     Plotting raw image, mask true, mask_pred. Support saving into given directory with given filename.
 
@@ -66,4 +66,4 @@ def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=True, sav
     if save_output_path:
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=500)
+        plt.savefig(filename, dpi=600)

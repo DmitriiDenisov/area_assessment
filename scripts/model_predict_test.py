@@ -1,7 +1,6 @@
 import os
 import cv2
 import logging
-import gdal
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -17,9 +16,9 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 # MODEL
-model = cnn_v4()
+model = cnn_v5()
 # model.summary()
-net_weights_load = '../weights/sakaka_cnn_v4_w_13.h5'
+net_weights_load = '../weights/sakaka_cnn_v3_w_6.h5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
@@ -31,7 +30,7 @@ nn_output_patch_size = (16, 16)
 
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
-dir_valid = '../sakaka_data/test/'  # '../../data/mass_buildings/valid/'
+dir_valid = '../sakaka_data/valid/'  # '../../data/mass_buildings/valid/'
 # dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Er_Riadh/')
 dir_valid_sat = dir_valid + 'sat/'
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
@@ -70,15 +69,18 @@ for i, f_sat in enumerate(valid_sat_files):
     logging.debug('raw (imgsize) map_pred.shape: {}'.format(map_pred.shape))
 
     # PLOT OVERLAY IMG, MASK_PRED
-    plot_img_mask(img_sat_, map_pred,
-                  name='TEST_IMG_{}_OVERLAY_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size),
-                  overlay=True, alpha=0.3, show_plot=False, save_output_path=output_folder)
+    plot_img_mask(img_sat_, map_pred, name='{}_OVERLAY_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size),
+                  overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
 
-    # plot_img(map_pred,
-    #          name='VALID_IMG_{}_PRED_stepsize{}_subpatchsize{}'.format(f_sat, step_size, nn_output_patch_size[0]),
-    #          show_plot=False, save_output_path=output_folder)
+    plot_img(map_pred, name='{}_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
+             show_plot=False, save_output_path=output_folder)
+
+    plot_img(img_sat_, name='{}_ORIG_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
+             show_plot=False, save_output_path=output_folder)
 
     # WRITE GEOTIFF
-    geotiff_output_path = output_folder+'{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4])
-    write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=gdal.Open(f_sat))
+    # geotiff_output_path = output_folder+'{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4])
+    # write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
+
+    # np.save('{}_OVERLAY_GRABCUT_stepsize{}.npy'.format(f_sat.split('/')[-1][:-4], step_size), map_pred)
 

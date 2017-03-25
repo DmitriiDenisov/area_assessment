@@ -2,13 +2,13 @@ import cv2
 import os
 import numpy as np
 import logging
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, ModelCheckpoint
 from sklearn.feature_extraction.image import *
 from sklearn.metrics import jaccard_similarity_score
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.images_processing.patching import array2patches
 from area_assesment.io_operations.visualization import plot_img_mask
-from area_assesment.neural_networks.cnn import cnn_v4, cnn_v3
+from area_assesment.neural_networks.cnn import *
 import hashlib
 
 #########################################################
@@ -16,7 +16,7 @@ import hashlib
 # PYTHONPATH=~/area_assesment/ python3 model_train.py
 #########################################################
 
-logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.DEBUG,
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
 # PATCHING SETTINGS
@@ -24,14 +24,14 @@ nn_input_patch_size = (64, 64)
 nn_output_patch_size = (16, 16)
 step_size = 8
 
-# MODEL TRAINING SETTINGS
-epochs = 1
-net_weights_load = os.path.normpath('../weights/sakaka_cnn_v4_w_15.h5')
-net_weights_save = os.path.normpath('../weights/sakaka_cnn_v4_w_16.h5')
+# MODEL SETTINGS
+epochs = 10
+net_weights_load = None  # os.path.normpath('../weights/cnn_v3/weights_epoch09_loss0.1922.hdf5')
+net_weights_dir_save = os.path.normpath('../weights/cnn_v5/')
 
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = '../sakaka_data/train/'  # '../../data/mass_buildings/train/'
+dir_train = '../sakaka_data/test/'  # '../../data/mass_buildings/train/'
 dir_train_sat = dir_train + 'sat/'
 dir_train_map = dir_train + 'map/'
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
@@ -40,19 +40,18 @@ train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')
 
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1]))
-for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))[:1]):
+for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_sat_files), f_sat, f_map))
     img_sat, img_map = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
-    logging.debug('img_sat.shape: {}'.format(img_sat.shape))
-    logging.debug('img_map.shape: {}'.format(img_map.shape))
+    logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
     # print('Hash img_sat: ', hashlib.sha1(img_sat.view(np.uint8)).hexdigest())
     # print('Hash img_map: ', hashlib.sha1(img_map.view(np.uint8)).hexdigest())
+    logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
     img_sat = img_sat.astype('float32')
-    ret, img_map = cv2.threshold(img_map, 127, 255, cv2.THRESH_BINARY)
+    ret, img_map = cv2.threshold(img_map.astype(np.uint8), 127, 255, cv2.THRESH_BINARY)
     img_map = img_map.astype('float32')
-    img_sat /= 255  # (img_sat - img_sat.mean())/img_sat.std()
+    img_sat /= 255
     img_map /= 255
-    # plot_img_mask(img_sat, img_map)
 
     img_sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     img_map_patches = array2patches(img_map, patch_size=nn_input_patch_size, step_size=step_size)
@@ -71,18 +70,18 @@ logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
 logging.debug('map_patches.shape: {}'.format(map_patches.shape))
 
 # MODEL DEFINITION
-logging.info('MODEL DEFINITION')
-model = cnn_v4()
+# logging.info('MODEL DEFINITION')
+model = cnn_v6()
 model.summary()
 
 # LOADING PREVIOUS WEIGHTS OF MODEL
-logging.info('LOADING PREVIOUS WEIGHTS OF MODEL: {}'.format(net_weights_load))
-model.load_weights(net_weights_load)
+if net_weights_load:
+    logging.info('LOADING PREVIOUS WEIGHTS OF MODEL: {}'.format(net_weights_load))
+    model.load_weights(net_weights_load)
 
-# FIT MODEL AND SAVE NEXT
-logging.info('FIT MODEL: {} EPOCHS'.format(epochs))
-tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
-model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[tb_callback])
-
-logging.info('SAVE MODEL WEIGHTS:{}'.format(net_weights_save))
-model.save_weights(net_weights_save)
+# FIT MODEL AND SAVE WEIGHTS
+logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
+# tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
+checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save, 'weights_epoch{epoch:02d}_loss{loss:.4f}.hdf5'),
+                             monitor='loss', save_best_only=True)
+model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128)

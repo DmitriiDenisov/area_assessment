@@ -30,7 +30,7 @@ def array2patches(arr, patch_size=(64, 64), step_size=64):
     :param step_size: integer, indicates how many pixels are skipped in both the (x, y) direction
     :return: numpy array of shape ((arr.shape[0]-patch.shape[0])//step_size + 1, nn_input_patch_size[0], nn_input_patch_size[1], ...)
     """
-    logging.debug('PATCHING IMG')
+    logging.info('ARRAY2PATCHES')
     return np.array([arr[i: i + patch_size[0], j: j + patch_size[1]]
                      for i in range(0, arr.shape[0] - patch_size[0], step_size)
                      for j in range(0, arr.shape[1] - patch_size[1], step_size)])

@@ -6,7 +6,7 @@ Interactive Image Segmentation using GrabCut algorithm.
 This sample shows interactive image segmentation using grabcut algorithm.
 
 USAGE:
-    python grabcut.py <filename>
+    python grabcut_from_console.py <filename>
 
 README FIRST:
     Two windows will show up, one for input and one for output.
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         filename = sys.argv[1]  # for drawing purposes
     else:
         print("No input image given, so loading default image, ../data/lena.jpg \n")
-        print("Correct Usage: python grabcut.py <filename> \n")
+        print("Correct Usage: python grabcut_from_console.py <filename> \n")
         filename = '../data/lena.jpg'
 
     img = cv2.imread(filename)[:600, :600, :600]
