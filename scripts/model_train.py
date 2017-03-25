@@ -1,5 +1,7 @@
 import cv2
+import os
 import numpy as np
+import logging
 from keras.callbacks import TensorBoard
 from sklearn.feature_extraction.image import *
 from sklearn.metrics import jaccard_similarity_score
@@ -14,30 +16,35 @@ import hashlib
 # PYTHONPATH=~/area_assesment/ python3 model_train.py
 #########################################################
 
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.DEBUG,
+                    handlers=[logging.StreamHandler()])
+
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
 nn_output_patch_size = (16, 16)
 step_size = 8
 
 # MODEL TRAINING SETTINGS
-epochs = 3
-net_weights_version = 15  # use previous weights
+epochs = 1
+net_weights_load = os.path.normpath('../weights/sakaka_cnn_v4_w_15.h5')
+net_weights_save = os.path.normpath('../weights/sakaka_cnn_v4_w_16.h5')
 
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = '../sakaka_data/test/'  # '../../data/mass_buildings/train/'
+dir_train = '../sakaka_data/train/'  # '../../data/mass_buildings/train/'
 dir_train_sat = dir_train + 'sat/'
 dir_train_map = dir_train + 'map/'
+logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
 train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')
 train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')
 
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1]))
-for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
-    print('PATCHING IMG: {}/{}, {}, {}'.format(i + 1, len(train_sat_files), f_sat, f_map))
+for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))[:1]):
+    logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_sat_files), f_sat, f_map))
     img_sat, img_map = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
-    print('img_sat.shape: {}'.format(img_sat.shape))
-    print('img_map.shape: {}'.format(img_map.shape))
+    logging.debug('img_sat.shape: {}'.format(img_sat.shape))
+    logging.debug('img_map.shape: {}'.format(img_map.shape))
     # print('Hash img_sat: ', hashlib.sha1(img_sat.view(np.uint8)).hexdigest())
     # print('Hash img_map: ', hashlib.sha1(img_map.view(np.uint8)).hexdigest())
     img_sat = img_sat.astype('float32')
@@ -57,23 +64,25 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
                       nn_input_patch_size[0]//2 + nn_output_patch_size[0]//2,
                       nn_input_patch_size[1]//2 - nn_output_patch_size[1]//2:
                       nn_input_patch_size[1]//2 + nn_output_patch_size[1]//2]
-    print('sat_patches.shape: {}'.format(img_sat_patches.shape))
-    print('img_map_patches.shape: {}'.format(img_map_patches.shape))
+    logging.debug('sat_patches.shape: {}'.format(img_sat_patches.shape))
+    logging.debug('img_map_patches.shape: {}'.format(img_map_patches.shape))
     sat_patches, map_patches = np.append(sat_patches, img_sat_patches, 0), np.append(map_patches, img_map_patches, 0)
-print('sat_patches.shape: {}'.format(sat_patches.shape))
-print('map_patches.shape: {}'.format(map_patches.shape))
+logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
+logging.debug('map_patches.shape: {}'.format(map_patches.shape))
 
-# MODEL DETERMINE
+# MODEL DEFINITION
+logging.info('MODEL DEFINITION')
 model = cnn_v4()
 model.summary()
 
 # LOADING PREVIOUS WEIGHTS OF MODEL
-model.load_weights('../weights/sakaka_cnn_v4_w_{}.h5'.format(net_weights_version))
+logging.info('LOADING PREVIOUS WEIGHTS OF MODEL: {}'.format(net_weights_load))
+model.load_weights(net_weights_load)
 
 # FIT MODEL AND SAVE NEXT
+logging.info('FIT MODEL: {} EPOCHS'.format(epochs))
 tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
 model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[tb_callback])
-net_weights = '../weights/sakaka_cnn_v4_w_{}.h5'.format(net_weights_version+1)
-print('CNN WEIGHTS:{}'.format(net_weights))
-model.save_weights(net_weights)
 
+logging.info('SAVE MODEL WEIGHTS:{}'.format(net_weights_save))
+model.save_weights(net_weights_save)

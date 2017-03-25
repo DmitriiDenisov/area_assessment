@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import logging
+# import matplotlib
+# matplotlib.use('Agg')
 
 
 def plot_img(img, name=None, show_plot=True, save_output_path=None):
@@ -11,7 +14,7 @@ def plot_img(img, name=None, show_plot=True, save_output_path=None):
         plt.show()
     if save_output_path:
         filename = save_output_path + name + '.png'
-        print('PLOT: {}'.format(filename))
+        logging.info('PLOT: {}'.format(filename))
         plt.savefig(filename)
 
 
@@ -34,7 +37,7 @@ def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=True,
         plt.show()
     if save_output_path:
         filename = save_output_path + name + '.png'
-        print('PLOT: {}'.format(filename))
+        logging.info('PLOT: {}'.format(filename))
         plt.savefig(filename, dpi=500)
 
 
@@ -62,5 +65,5 @@ def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=True, sav
         plt.show()
     if save_output_path:
         filename = save_output_path + name + '.png'
-        print('PLOT: {}'.format(filename))
+        logging.info('PLOT: {}'.format(filename))
         plt.savefig(filename, dpi=500)

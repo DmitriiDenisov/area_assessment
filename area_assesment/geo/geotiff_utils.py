@@ -1,8 +1,10 @@
 import numpy as np
 import gdal
+import logging
 
 
 def write_geotiff(path: str, raster_layers: np.array, gdal_ds: gdal.Dataset):
+    logging.info('WRITING GEOTIFF')
     driver = gdal.GetDriverByName('GTiff')
     out_raster = driver.Create(path,
                                raster_layers.shape[1],
@@ -24,3 +26,4 @@ def write_geotiff(path: str, raster_layers: np.array, gdal_ds: gdal.Dataset):
         out_raster.GetRasterBand(1).WriteArray(raster_layers)
 
     out_raster.FlushCache()
+    logging.info('GEOTIFF SAVED: {}'.format(path))

@@ -1,4 +1,5 @@
 import cv2
+import logging
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -11,7 +12,9 @@ from area_assesment.neural_networks.cnn import *
 # MODEL
 model = cnn_v4()
 # model.summary()
-model.load_weights('../weights/sakaka_cnn_v4_w_15.h5')
+net_weights_load = '../weights/sakaka_cnn_v4_w_15.h5'
+logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
+model.load_weights(net_weights_load)
 
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
