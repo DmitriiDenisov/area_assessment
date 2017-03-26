@@ -80,50 +80,30 @@ def cnn_v4():
 
 
 def cnn_v5():
+    """
+    input shape: (64, 64, 32)
+    output shape: (48, 48)
+    :return:
+    """
     model = Sequential()
     model.add(BatchNormalization(input_shape=(64, 64, 3)))
 
-    model.add(Conv2D(filters=32, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=32, kernel_size=3, strides=1, activation='relu'))
+    model.add(Conv2D(filters=32, kernel_size=5, strides=1, activation='relu'))
     model.add(MaxPooling2D(pool_size=2, strides=1))
 
     model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-
-    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-
-    model.add(Conv2D(filters=256, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=256, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-
-    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu'))
     model.add(MaxPooling2D(pool_size=2, strides=1))
 
     model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=1))
+
     model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
     model.add(MaxPooling2D(pool_size=2, strides=1))
 
-    model.add(Conv2D(filters=32, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=32, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
+    model.add(Conv2D(filters=1, kernel_size=3, strides=1, activation='sigmoid'))
 
-    model.add(Conv2D(filters=16, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=16, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-
-    model.add(Conv2D(filters=8, kernel_size=3, strides=1, activation='relu'))
-    model.add(Conv2D(filters=8, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-
-    model.add(Conv2D(filters=1, kernel_size=4, strides=1, activation='sigmoid'))
-
-    # model.add(UpSampling2D(size=2))
-    model.add(Reshape((16, 16)))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.add(Reshape((48, 48)))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', jaccard_coef])
     return model
 
 
@@ -156,7 +136,7 @@ def cnn_v6():
 def baseline_model():
     model = Sequential()
     model.add(Flatten(input_shape=(64, 64, 3), activation='relu'))
-    model.add(Dense(64**2, activation='sigmoid'))
+    model.add(Dense(16**2, activation='sigmoid'))
     model.add(Reshape((16, 16)))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model

@@ -16,21 +16,20 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 # MODEL
-model = cnn_v5()
+model = cnn_v6()
 # model.summary()
-net_weights_load = '../weights/sakaka_cnn_v3_w_6.h5'
+net_weights_load = '../weights/cnn_v6/weights_epoch15_loss0.0549.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
-
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
-step_size = 16
+step_size = 8
 nn_output_patch_size = (16, 16)
 
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
-dir_valid = '../sakaka_data/valid/'  # '../../data/mass_buildings/valid/'
+dir_valid = '../sakaka_data/test/'  # '../../data/mass_buildings/valid/'
 # dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Er_Riadh/')
 dir_valid_sat = dir_valid + 'sat/'
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
@@ -55,6 +54,7 @@ for i, f_sat in enumerate(valid_sat_files):
     sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
 
+    logging.info('PREDICTING')
     map_patches_pred = model.predict(sat_patches)
     logging.debug('map_patches_pred.shape: {}'.format(map_patches_pred.shape))
 

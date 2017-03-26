@@ -15,7 +15,7 @@ def plot_img(img, name=None, show_plot=False, save_output_path=None):
     if save_output_path:
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=600)
+        plt.savefig(filename, dpi=1000)
 
 
 def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_output_path=None):
@@ -38,7 +38,7 @@ def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False
     if save_output_path:
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=600)
+        plt.savefig(filename, dpi=1000)
 
 
 def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=False, save_output_path=None):
@@ -66,4 +66,4 @@ def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=False, sa
     if save_output_path:
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=600)
+        plt.savefig(filename, dpi=500)

@@ -16,19 +16,18 @@ import hashlib
 # PYTHONPATH=~/area_assesment/ python3 model_train.py
 #########################################################
 
-logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.DEBUG,
                     handlers=[logging.StreamHandler()])
 
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
-nn_output_patch_size = (16, 16)
+nn_output_patch_size = (48, 48)  # (16, 16)
 step_size = 8
 
 # MODEL SETTINGS
-epochs = 10
-net_weights_load = None  # os.path.normpath('../weights/cnn_v3/weights_epoch09_loss0.1922.hdf5')
+epochs = 30
+net_weights_load = None  # os.path.normpath('../weights/cnn_v6/weights_epoch01_loss0.0660.hdf5')
 net_weights_dir_save = os.path.normpath('../weights/cnn_v5/')
-
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
 dir_train = '../sakaka_data/test/'  # '../../data/mass_buildings/train/'
@@ -41,7 +40,7 @@ train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1]))
 for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
-    logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_sat_files), f_sat, f_map))
+    logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_map_files), f_sat, f_map))
     img_sat, img_map = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
     logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
     # print('Hash img_sat: ', hashlib.sha1(img_sat.view(np.uint8)).hexdigest())
@@ -59,10 +58,10 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     #     print(sat_patch.shape, map_patch.shape)
     #     plot_img_mask(sat_patch, map_patch, show_plot=True)
     img_map_patches = img_map_patches[:,
-                      nn_input_patch_size[0]//2 - nn_output_patch_size[0]//2:
-                      nn_input_patch_size[0]//2 + nn_output_patch_size[0]//2,
-                      nn_input_patch_size[1]//2 - nn_output_patch_size[1]//2:
-                      nn_input_patch_size[1]//2 + nn_output_patch_size[1]//2]
+                                      nn_input_patch_size[0]//2 - nn_output_patch_size[0]//2:
+                                      nn_input_patch_size[0]//2 + nn_output_patch_size[0]//2,
+                                      nn_input_patch_size[1]//2 - nn_output_patch_size[1]//2:
+                                      nn_input_patch_size[1]//2 + nn_output_patch_size[1]//2]
     logging.debug('sat_patches.shape: {}'.format(img_sat_patches.shape))
     logging.debug('img_map_patches.shape: {}'.format(img_map_patches.shape))
     sat_patches, map_patches = np.append(sat_patches, img_sat_patches, 0), np.append(map_patches, img_map_patches, 0)
@@ -70,8 +69,8 @@ logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
 logging.debug('map_patches.shape: {}'.format(map_patches.shape))
 
 # MODEL DEFINITION
-# logging.info('MODEL DEFINITION')
-model = cnn_v6()
+logging.info('MODEL DEFINITION')
+model = cnn_v5()
 model.summary()
 
 # LOADING PREVIOUS WEIGHTS OF MODEL
