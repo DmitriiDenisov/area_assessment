@@ -13,16 +13,16 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 # MODEL
-model = cnn_v6()
+model = cnn_v5()
 # model.summary()
-net_weights_load = '../weights/cnn_v6/weights_epoch12_loss0.0555.hdf5'
+net_weights_load = '../weights/cnn_v5/w_epoch09_jaccard0.8365.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
-step_size = 2
-nn_output_patch_size = (16, 16)
+step_size = 16
+nn_output_patch_size = (48, 48)  # (16, 16)
 
 # VALIDATION ON ALL IMAGES IN THE VALID DIRECTORY
 # dir_valid = '../../data/mass_buildings/valid/'
@@ -37,7 +37,7 @@ output_folder = '../sakaka_data/output/sakaka_valid/'
 for i, (f_sat, f_map) in enumerate(list(zip(valid_sat_files, valid_map_files))):
     logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(valid_sat_files), f_sat, f_map))
     img_sat_, img_map_ = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
-    img_sat_, img_map_ = img_sat_[255:, 128:], img_map_[255:, 128:]
+    # img_sat_, img_map_ = img_sat_[255:, 128:], img_map_[255:, 128:]
     logging.debug('img_sat_.shape: {}, img_map_.shape: {}'.format(img_sat_.shape, img_map_.shape))
 
     img_size = img_sat_.shape[:2]
@@ -61,7 +61,7 @@ for i, (f_sat, f_map) in enumerate(list(zip(valid_sat_files, valid_map_files))):
     sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
 
-    logging.info('PREDICTING')
+    logging.info('PREDICTING, sat_patches.shape:{}'.format(sat_patches.shape))
     map_patches_pred = model.predict(sat_patches)
     logging.debug('map_patches_pred.shape: {}'.format(map_patches_pred.shape))
 

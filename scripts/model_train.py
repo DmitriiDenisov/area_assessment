@@ -26,7 +26,7 @@ step_size = 8
 
 # MODEL SETTINGS
 epochs = 30
-net_weights_load = None  # os.path.normpath('../weights/cnn_v6/weights_epoch01_loss0.0660.hdf5')
+net_weights_load = os.path.normpath('../weights/cnn_v5/w_epoch09_jaccard0.8365.hdf5')
 net_weights_dir_save = os.path.normpath('../weights/cnn_v5/')
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
@@ -81,6 +81,6 @@ if net_weights_load:
 # FIT MODEL AND SAVE WEIGHTS
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 # tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
-checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save, 'weights_epoch{epoch:02d}_loss{loss:.4f}.hdf5'),
+checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save, 'w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}.hdf5'),
                              monitor='loss', save_best_only=True)
-model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128)
+model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.1)

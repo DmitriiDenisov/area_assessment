@@ -12,20 +12,20 @@ from area_assesment.neural_networks.cnn import *
 from area_assesment.geo.geotiff_utils import write_geotiff
 
 
-logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.DEBUG,
                     handlers=[logging.StreamHandler()])
 
 # MODEL
-model = cnn_v6()
+model = cnn_v5()
 # model.summary()
-net_weights_load = '../weights/cnn_v6/weights_epoch15_loss0.0549.hdf5'
+net_weights_load = '../weights/cnn_v5/w_epoch09_jaccard0.8365.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
-step_size = 8
-nn_output_patch_size = (16, 16)
+step_size = 48  # 16
+nn_output_patch_size = (48, 48)  # (16, 16)
 
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
@@ -38,7 +38,7 @@ output_folder = '../sakaka_data/output/sakaka_test/'
 
 for i, f_sat in enumerate(valid_sat_files):
     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(valid_sat_files), f_sat))
-    img_sat_ = cv2.imread(f_sat)  # [-1000:, -1000:]
+    img_sat_ = cv2.imread(f_sat)  # [-500:, -1000:]
 
     logging.debug('raw img_sat_.shape: {}'.format(img_sat_.shape))
     img_size = img_sat_.shape[:2]
@@ -54,7 +54,7 @@ for i, f_sat in enumerate(valid_sat_files):
     sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
 
-    logging.info('PREDICTING')
+    logging.info('PREDICTING, sat_patches.shape:{}'.format(sat_patches.shape))
     map_patches_pred = model.predict(sat_patches)
     logging.debug('map_patches_pred.shape: {}'.format(map_patches_pred.shape))
 

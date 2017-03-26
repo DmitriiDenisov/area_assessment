@@ -94,10 +94,10 @@ def cnn_v5():
     model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
     model.add(MaxPooling2D(pool_size=2, strides=1))
 
-    model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
+    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu'))
     model.add(MaxPooling2D(pool_size=2, strides=1))
 
-    model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu'))
+    model.add(Conv2D(filters=256, kernel_size=3, strides=1, activation='relu'))
     model.add(MaxPooling2D(pool_size=2, strides=1))
 
     model.add(Conv2D(filters=1, kernel_size=3, strides=1, activation='sigmoid'))
