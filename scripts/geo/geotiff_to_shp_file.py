@@ -45,7 +45,7 @@ for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.p
     mask[mask < 127] = 0
     mask[mask >= 127] = 1
 
-    image_polygons = mask_to_polygons(mask, epsilon=1, min_area=0.02)
+    image_polygons = mask_to_polygons(mask, epsilon=2, min_area=0.02)
 
     gdal_ds = gdal.Open(cur_file_path, GA_ReadOnly)
     top_left_x = gdal_ds.GetGeoTransform()[0]

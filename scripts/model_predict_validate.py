@@ -13,7 +13,7 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 # MODEL
-model = cnn_v5()
+model = cnn_v3()
 # model.summary()
 net_weights_load = '../weights/cnn_v5/w_epoch09_jaccard0.8365.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))

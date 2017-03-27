@@ -12,28 +12,28 @@ from area_assesment.neural_networks.cnn import *
 from area_assesment.geo.geotiff_utils import write_geotiff
 
 
-logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.DEBUG,
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
 # MODEL
-model = cnn_v5()
+model = cnn_v4()
 # model.summary()
-net_weights_load = '../weights/cnn_v5/w_epoch09_jaccard0.8365.hdf5'
+net_weights_load = '../weights/cnn_v4/sakaka_cnn_v4_w_16.h5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
-step_size = 48  # 16
-nn_output_patch_size = (48, 48)  # (16, 16)
+step_size = 16
+nn_output_patch_size = (16, 16)
 
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
-dir_valid = '../sakaka_data/test/'  # '../../data/mass_buildings/valid/'
-# dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Er_Riadh/')
-dir_valid_sat = dir_valid + 'sat/'
+# dir_valid = os.path.normpath('../sakaka_data/test/')  # '../../data/mass_buildings/valid/'
+# dir_valid_sat = os.path.join(dir_valid, 'sat/')
+dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
-valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')
+valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')[20:]
 output_folder = '../sakaka_data/output/sakaka_test/'
 
 for i, f_sat in enumerate(valid_sat_files):
@@ -69,18 +69,18 @@ for i, f_sat in enumerate(valid_sat_files):
     logging.debug('raw (imgsize) map_pred.shape: {}'.format(map_pred.shape))
 
     # PLOT OVERLAY IMG, MASK_PRED
-    plot_img_mask(img_sat_, map_pred, name='{}_OVERLAY_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size),
-                  overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
+    # plot_img_mask(img_sat_, map_pred, name='{}_OVERLAY_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size),
+    #               overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
 
-    plot_img(map_pred, name='{}_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
-             show_plot=False, save_output_path=output_folder)
+    # plot_img(map_pred, name='{}_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
+    #          show_plot=False, save_output_path=output_folder)
 
-    plot_img(img_sat_, name='{}_ORIG_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
-             show_plot=False, save_output_path=output_folder)
+    # plot_img(img_sat_, name='{}_ORIG_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
+    #          show_plot=False, save_output_path=output_folder)
 
     # WRITE GEOTIFF
-    # geotiff_output_path = output_folder+'{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4])
-    # write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
+    geotiff_output_path = output_folder+'{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4])
+    write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
 
     # np.save('{}_OVERLAY_GRABCUT_stepsize{}.npy'.format(f_sat.split('/')[-1][:-4], step_size), map_pred)
 

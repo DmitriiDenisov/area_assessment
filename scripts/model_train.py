@@ -16,21 +16,21 @@ import hashlib
 # PYTHONPATH=~/area_assesment/ python3 model_train.py
 #########################################################
 
-logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.DEBUG,
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
-nn_output_patch_size = (48, 48)  # (16, 16)
+nn_output_patch_size = (16, 16)  # (16, 16)
 step_size = 8
 
 # MODEL SETTINGS
 epochs = 30
-net_weights_load = os.path.normpath('../weights/cnn_v5/w_epoch09_jaccard0.8365.hdf5')
-net_weights_dir_save = os.path.normpath('../weights/cnn_v5/')
+net_weights_load = os.path.normpath('../weights/cnn_v4/sakaka_cnn_v4_w_16.h5')
+net_weights_dir_save = os.path.normpath('../weights/cnn_v4/')
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = '../sakaka_data/test/'  # '../../data/mass_buildings/train/'
+dir_train = '../sakaka_data/train/'  # '../../data/mass_buildings/train/'
 dir_train_sat = dir_train + 'sat/'
 dir_train_map = dir_train + 'map/'
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
@@ -70,7 +70,7 @@ logging.debug('map_patches.shape: {}'.format(map_patches.shape))
 
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
-model = cnn_v5()
+model = cnn_v4()
 model.summary()
 
 # LOADING PREVIOUS WEIGHTS OF MODEL
@@ -81,6 +81,7 @@ if net_weights_load:
 # FIT MODEL AND SAVE WEIGHTS
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 # tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
-checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save, 'w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}.hdf5'),
-                             monitor='loss', save_best_only=True)
-model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.1)
+checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
+                             'w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}_valjaccard{val_jaccard_coef:.4f}.hdf5'),
+                             monitor='val_loss', save_best_only=False)
+model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.2)

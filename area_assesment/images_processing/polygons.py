@@ -38,10 +38,15 @@ def mask_to_polygons(mask, epsilon=5, min_area=.1):
             x_coord = cnt[:, 0, 0]
             y_coord = cnt[:, 0, 1]
             cnt[:, 0, 1] = 2 * vert_axis - y_coord
+            cnt = cv2.boxPoints(cv2.minAreaRect(cnt))  # rectangular polygons
             poly = Polygon(
-                shell=cnt[:, 0, :],
+                shell=cnt[:, :],
                 holes=[c[:, 0, :] for c in cnt_children.get(idx, [])
                        if cv2.contourArea(c) >= min_area])
+            # poly = Polygon(
+            #     shell=cnt[:, 0, :],
+            #     holes=[c[:, 0, :] for c in cnt_children.get(idx, [])
+            #            if cv2.contourArea(c) >= min_area])
             all_polygons.append(poly)
     # approximating polygons might have created invalid ones, fix them
     all_polygons = MultiPolygon(all_polygons)
