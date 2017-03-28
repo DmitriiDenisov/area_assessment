@@ -21,6 +21,8 @@ parser.add_argument('-v', '--verbose', dest='v', action='store_const',
 parser.add_argument('-l', '--layer_name', dest='ln', type=str,
                     default='default',
                     help='layer name')
+parser.add_argument('--target_EPSG', dest='t_epsg', type=int,
+                    help='EPSG code to reproject geometry')
 
 try:
     args = parser.parse_args()
@@ -68,8 +70,22 @@ mult_p = MultiPolygon(polygons_list)
 driver = ogr.GetDriverByName('ESRI Shapefile')
 ds = driver.CreateDataSource(args.dst_shp)
 
-srs = osr.SpatialReference()
-srs.ImportFromWkt(projection_wkt)
+source_srs = osr.SpatialReference()
+source_srs.ImportFromWkt(projection_wkt)
+srs = source_srs
+
+
+# Make a geometry, from Shapely object
+geom = ogr.CreateGeometryFromWkb(mult_p.wkb)
+
+if (args.t_epsg is not None):
+    target_srs = osr.SpatialReference()
+    target_srs.ImportFromEPSG(args.t_epsg)
+
+    transform = osr.CoordinateTransformation(source_srs, target_srs)
+    srs = target_srs
+
+    geom.Transform(transform)
 
 layer = ds.CreateLayer(args.ln, srs, ogr.wkbMultiPolygon)
 
@@ -81,8 +97,6 @@ defn = layer.GetLayerDefn()
 feat = ogr.Feature(defn)
 feat.SetField(args.ln, 1)
 
-# Make a geometry, from Shapely object
-geom = ogr.CreateGeometryFromWkb(mult_p.wkb)
 feat.SetGeometry(geom)
 
 layer.CreateFeature(feat)
