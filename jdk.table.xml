@@ -1,0 +1,96 @@
+<application>
+  <component name="ProjectJdkTable">
+    <jdk version="2">
+      <name value="Python 3.4.3 (C:\Python34\python.exe)" />
+      <type value="Python SDK" />
+      <version value="Python 3.4.3" />
+      <homePath value="C:\Python34\python.exe" />
+      <roots>
+        <classPath>
+          <root type="composite">
+            <root type="simple" url="file://C:/Python34/DLLs" />
+            <root type="simple" url="file://C:/Python34/Lib" />
+            <root type="simple" url="file://C:/Python34" />
+            <root type="simple" url="file://C:/Python34/Lib/site-packages" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/-1442825926" />
+            <root type="simple" url="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons" />
+          </root>
+        </classPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional />
+    </jdk>
+    <jdk version="2">
+      <name value="Remote Python 2.7.5 (sftp://jbologov@rumos0670.atrema.deloitte.com:22/usr/bin/python)" />
+      <type value="Python SDK" />
+      <version value="Python 2.7.5" />
+      <homePath value="sftp://jbologov@rumos0670.atrema.deloitte.com:22/usr/bin/python" />
+      <roots>
+        <classPath>
+          <root type="composite">
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/1646051593" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/704340502" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/-289277395" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/-1458322845" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/918732847" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/1695739257" />
+            <root type="simple" url="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons" />
+          </root>
+        </classPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional WEB_SERVER_CONFIG_ID="4b32d909-35c3-428b-94d9-5c1cbaa7c8ff" WEB_SERVER_CONFIG_NAME="Copy of project-level server 'rumos0670'" HOST="rumos0670.atrema.deloitte.com" PORT="22" ANONYMOUS="false" USERNAME="jbologov" PASSWORD="" PRIVATE_KEY_FILE="" MY_KNOWN_HOSTS_FILE="" PASSPHRASE="" USE_KEY_PAIR="false" INTERPRETER_PATH="/usr/bin/python" HELPERS_PATH="/home/jbologov/.pycharm_helpers" INITIALIZED="false" VALID="true" SKELETONS_PATH="" VERSION="Python 2.7.5">
+        <PathMappingSettings>
+          <option name="pathMappings">
+            <list>
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/1646051593" remote-root="/usr/lib64/python2.7" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/704340502" remote-root="/usr/lib64/python2.7/plat-linux2" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/-289277395" remote-root="/usr/lib64/python2.7/site-packages" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/-1458322845" remote-root="/usr/lib64/python2.7/site-packages/gtk-2.0" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1695739257/918732847" remote-root="/usr/lib/python2.7/site-packages" />
+            </list>
+          </option>
+        </PathMappingSettings>
+      </additional>
+    </jdk>
+    <jdk version="2">
+      <name value="Remote Python 3.4.3 (sftp://jbologov@rumos0670.atrema.deloitte.com:22/usr/bin/python3)" />
+      <type value="Python SDK" />
+      <version value="Python 3.4.3" />
+      <homePath value="sftp://jbologov@rumos0670.atrema.deloitte.com:22/usr/bin/python3" />
+      <roots>
+        <classPath>
+          <root type="composite">
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/1513969793" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/1646052551" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/-592991458" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/836344171" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/2044354413" />
+            <root type="simple" url="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/1028309466" />
+            <root type="simple" url="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons" />
+          </root>
+        </classPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional WEB_SERVER_CONFIG_ID="2529a054-4d23-418d-8201-8b53adf98ff3" WEB_SERVER_CONFIG_NAME="Copy of project-level server 'rumos0670' (1)" HOST="rumos0670.atrema.deloitte.com" PORT="22" ANONYMOUS="false" USERNAME="jbologov" PASSWORD="" PRIVATE_KEY_FILE="" MY_KNOWN_HOSTS_FILE="" PASSPHRASE="" USE_KEY_PAIR="false" INTERPRETER_PATH="/usr/bin/python3" HELPERS_PATH="/home/jbologov/.pycharm_helpers" INITIALIZED="false" VALID="true" SKELETONS_PATH="" VERSION="Python 3.4.3">
+        <PathMappingSettings>
+          <option name="pathMappings">
+            <list>
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/1513969793" remote-root="/usr/lib/python3.4/site-packages/pip-8.1.2-py3.4.egg" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/1646052551" remote-root="/usr/lib64/python3.4" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/-592991458" remote-root="/usr/lib64/python3.4/plat-linux" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/836344171" remote-root="/usr/lib64/python3.4/site-packages" />
+              <mapping local-root="$USER_HOME$/.PyCharm2016.2/system/remote_sources/1028309466/2044354413" remote-root="/usr/lib/python3.4/site-packages" />
+            </list>
+          </option>
+        </PathMappingSettings>
+      </additional>
+    </jdk>
+  </component>
+</application>

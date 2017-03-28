@@ -1,0 +1,17 @@
+<application>
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="4b32d909-35c3-428b-94d9-5c1cbaa7c8ff" name="rumos0670" url="http://rumos0670.atrema.deloitte.com">
+        <fileTransfer host="rumos0670.atrema.deloitte.com" port="22" rootFolder="/home/jbologov" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+  <component name="webServersAuthStorage">
+    <data>AAAAsFfeki9dtt3EheEgtCzEYD2ysK5g8iwauqWi8Ah2pRP96adfKOifA7duDdJe+Q5CKgju/MEygEdTSlulrvyjGUB15wp+sZcunbPcQHhHnQNM7xK6Z/55OiLWnt3cGw5gHga7Rv0wjZUjMYlfBh1gS/Wad7QEYG5q5+Ci+ImBK9LpL9UKHjpFP/ZX2e+/UTDmGFt/myw7G4FaRGvcgyrBNNYyiiwrvYBzU6gPz955UfDMvM+EWhWeige4URIBe+O67A==</data>
+  </component>
+</application>
