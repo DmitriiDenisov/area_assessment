@@ -75,7 +75,7 @@ def cnn_v4():
     model.add(Flatten())
     model.add(Dense(16 ** 2, activation='sigmoid'))
     model.add(Reshape((16, 16)))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', jaccard_coef])
     return model
 
 

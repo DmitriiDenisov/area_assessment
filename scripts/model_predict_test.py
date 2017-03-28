@@ -18,7 +18,7 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 # MODEL
 model = cnn_v4()
 # model.summary()
-net_weights_load = '../weights/cnn_v4/sakaka_cnn_v4_w_16.h5'
+net_weights_load = '../weights/cnn_v4/w_epoch29_jaccard0.0000_valjaccard0.0018.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
@@ -33,7 +33,7 @@ nn_output_patch_size = (16, 16)
 # dir_valid_sat = os.path.join(dir_valid, 'sat/')
 dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
-valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')[20:]
+valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')
 output_folder = '../sakaka_data/output/sakaka_test/'
 
 for i, f_sat in enumerate(valid_sat_files):

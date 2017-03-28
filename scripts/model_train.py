@@ -22,11 +22,11 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)
 nn_output_patch_size = (16, 16)  # (16, 16)
-step_size = 8
+step_size = 16
 
 # MODEL SETTINGS
 epochs = 30
-net_weights_load = os.path.normpath('../weights/cnn_v4/sakaka_cnn_v4_w_16.h5')
+net_weights_load = os.path.normpath('../weights/cnn_v4/w_epoch29_jaccard0.0000_valjaccard0.0018.hdf5')
 net_weights_dir_save = os.path.normpath('../weights/cnn_v4/')
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
@@ -34,8 +34,8 @@ dir_train = '../sakaka_data/train/'  # '../../data/mass_buildings/train/'
 dir_train_sat = dir_train + 'sat/'
 dir_train_map = dir_train + 'map/'
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
-train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')
-train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')
+train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')[1:2]
+train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')[1:2]
 
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1]))
