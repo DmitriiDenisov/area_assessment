@@ -11,5 +11,5 @@ def filenames_in_dir(dir_, endswith_):
     :param endswith_: file extension, for example '.tiff'
     :return: list with full paths to files with given extension endswith_ in the given directory dir_
     """
-    return [os.path.join(dir_, filename) for filename in os.listdir(dir_) if filename.endswith(endswith_)]
+    return sorted([os.path.join(dir_, filename) for filename in os.listdir(dir_) if filename.endswith(endswith_)])
 

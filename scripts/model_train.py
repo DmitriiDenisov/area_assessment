@@ -20,28 +20,34 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 # PATCHING SETTINGS
-nn_input_patch_size = (64, 64)
-nn_output_patch_size = (16, 16)  # (16, 16)
-step_size = 16
+nn_input_patch_size = (64, 64)  # (1024, 1024)  # (64, 64)
+nn_output_patch_size = (32, 32)  # (256, 256) # (16, 16)
+step_size = 16  # 256  # 16
+
+# MODEL DEFINITION
+logging.info('MODEL DEFINITION')
+model = cnn_v7()
+model.summary()
 
 # MODEL SETTINGS
-epochs = 30
-net_weights_load = os.path.normpath('../weights/cnn_v4/w_epoch29_jaccard0.0000_valjaccard0.0018.hdf5')
-net_weights_dir_save = os.path.normpath('../weights/cnn_v4/')
+epochs = 20
+net_weights_load = os.path.normpath('../weights/cnn_v7/w_epoch03_jaccard0.3890_valjaccard0.1482.hdf5')
+net_weights_dir_save = os.path.normpath('../weights/cnn_v7/')
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
 dir_train = '../sakaka_data/train/'  # '../../data/mass_buildings/train/'
 dir_train_sat = dir_train + 'sat/'
 dir_train_map = dir_train + 'map/'
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
-train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')[1:2]
-train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')[1:2]
+train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')
+train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')
 
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1]))
 for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_map_files), f_sat, f_map))
     img_sat, img_map = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
+    img_sat, img_map = img_sat, img_map
     logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
     # print('Hash img_sat: ', hashlib.sha1(img_sat.view(np.uint8)).hexdigest())
     # print('Hash img_map: ', hashlib.sha1(img_map.view(np.uint8)).hexdigest())
@@ -51,6 +57,7 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_map = img_map.astype('float32')
     img_sat /= 255
     img_map /= 255
+    # plot_img_mask(img_sat, img_map)
 
     img_sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     img_map_patches = array2patches(img_map, patch_size=nn_input_patch_size, step_size=step_size)
@@ -68,10 +75,6 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
 logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
 logging.debug('map_patches.shape: {}'.format(map_patches.shape))
 
-# MODEL DEFINITION
-logging.info('MODEL DEFINITION')
-model = cnn_v4()
-model.summary()
 
 # LOADING PREVIOUS WEIGHTS OF MODEL
 if net_weights_load:
