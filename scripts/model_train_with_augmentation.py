@@ -79,6 +79,9 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
 print('sat_patches.shape: {}'.format(sat_patches.shape))
 print('map_patches.shape: {}'.format(map_patches.shape))
 
+del img_sat
+del img_map
+
 print('augmenting images...')
 angles = [90, 180, 270]
 init_shape_sat = sat_patches.shape
