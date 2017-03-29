@@ -1,4 +1,0 @@
-gdal
-opencv-python
-shapely
-descartes

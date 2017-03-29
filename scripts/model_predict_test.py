@@ -15,23 +15,34 @@ from area_assesment.geo.geotiff_utils import write_geotiff
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
-# MODEL
-model = cnn_v7()
+# # MODEL builidings
+# model = cnn_v7()
+# # model.summary()
+# net_weights_load = '../weights/cnn_v7/w_epoch06_jaccard0.4800_valjaccard0.1533.hdf5'
+# logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
+# model.load_weights(net_weights_load)
+#
+# # PATCHING SETTINGS buildings
+# nn_input_patch_size = (64, 64)
+# step_size = 32
+# nn_output_patch_size = (32, 32)
+
+# # MODEL circle farms
+model = cnn_circle_farms()
 # model.summary()
-net_weights_load = '../weights/cnn_v7/w_epoch03_jaccard0.3890_valjaccard0.1482.hdf5'
+net_weights_load = '../weights/cnn_circle_farms/w_epoch99_jaccard0.6824_valjaccard0.4247.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
-# PATCHING SETTINGS
-nn_input_patch_size = (64, 64)
-step_size = 32
-nn_output_patch_size = (32, 32)
-
+# PATCHING SETTINGS circle farms
+nn_input_patch_size = (1024, 1024)  # (1024, 1024)  # (64, 64)
+nn_output_patch_size = (128, 128)  # (256, 256) # (16, 16)
+step_size = 128  # 256  # 16
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
 # dir_valid = os.path.normpath('../sakaka_data/test/')  # '../../data/mass_buildings/valid/'
 # dir_valid_sat = os.path.join(dir_valid, 'sat/')
-dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal_B_1m/')
+dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
 valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')
 output_folder = '../sakaka_data/output/sakaka_test/'

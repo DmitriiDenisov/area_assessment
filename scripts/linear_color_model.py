@@ -5,10 +5,10 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 
-img_file = '../../sakaka_data/google_earth_img/test.png'
+img_file = '../sakaka_data/google_earth_img/test.png'
 img = cv2.imread(img_file)
 
-img_file = '../../sakaka_data/google_earth_img/mask.png'
+img_file = '../sakaka_data/google_earth_img/mask.png'
 img_mask = cv2.imread(img_file, 0)
 ret, mask = cv2.threshold(img_mask, 127, 255, cv2.THRESH_BINARY)
 
