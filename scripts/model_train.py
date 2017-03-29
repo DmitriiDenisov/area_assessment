@@ -3,6 +3,7 @@ import os
 import numpy as np
 import logging
 from keras.callbacks import TensorBoard, ModelCheckpoint
+from keras.preprocessing.image import ImageDataGenerator
 from sklearn.feature_extraction.image import *
 from sklearn.metrics import jaccard_similarity_score
 from area_assesment.io_operations.data_io import filenames_in_dir
@@ -19,35 +20,38 @@ import hashlib
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
-# PATCHING SETTINGS
-nn_input_patch_size = (64, 64)  # (1024, 1024)  # (64, 64)
-nn_output_patch_size = (32, 32)  # (256, 256) # (16, 16)
-step_size = 16  # 256  # 16
+
 
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
-model = cnn_v7()
+model = cnn_circle_farms()
 model.summary()
 
+# PATCHING SETTINGS
+nn_input_patch_size = (1024, 1024)  # (1024, 1024)  # (64, 64)
+nn_output_patch_size = (128, 128)  # (256, 256) # (16, 16)
+step_size = 256  # 256  # 16
+
 # MODEL SETTINGS
-epochs = 20
-net_weights_load = os.path.normpath('../weights/cnn_v7/w_epoch03_jaccard0.3890_valjaccard0.1482.hdf5')
-net_weights_dir_save = os.path.normpath('../weights/cnn_v7/')
+epochs = 100
+net_weights_load = None  # os.path.normpath('../weights/cnn_circle_farms/w_epoch47_jaccard0.2444_valjaccard0.2122.hdf5')
+net_weights_dir_save = os.path.normpath('../weights/cnn_circle_farms/')
+########################################################
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = '../sakaka_data/train/'  # '../../data/mass_buildings/train/'
-dir_train_sat = dir_train + 'sat/'
-dir_train_map = dir_train + 'map/'
+dir_train = os.path.normpath('../sakaka_data/circle_farms/train/')  # '../../data/mass_buildings/train/'
+dir_train_sat = os.path.join(dir_train, 'sat/')
+dir_train_map = os.path.join(dir_train, 'map/')
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
-train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')
-train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')
+train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')[1:]
+train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')[1:]
 
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1]))
 for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_map_files), f_sat, f_map))
     img_sat, img_map = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
-    img_sat, img_map = img_sat, img_map
+    # img_sat, img_map = img_sat, img_map
     logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
     # print('Hash img_sat: ', hashlib.sha1(img_sat.view(np.uint8)).hexdigest())
     # print('Hash img_map: ', hashlib.sha1(img_map.view(np.uint8)).hexdigest())
@@ -57,12 +61,12 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_map = img_map.astype('float32')
     img_sat /= 255
     img_map /= 255
-    # plot_img_mask(img_sat, img_map)
+    # plot_img_mask(img_sat, img_map, show_plot=True)
 
     img_sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     img_map_patches = array2patches(img_map, patch_size=nn_input_patch_size, step_size=step_size)
     # for (sat_patch, map_patch) in list(zip(img_sat_patches, img_map_patches)):
-    #     print(sat_patch.shape, map_patch.shape)
+    #     logging.debug(sat_patch.shape, map_patch.shape)
     #     plot_img_mask(sat_patch, map_patch, show_plot=True)
     img_map_patches = img_map_patches[:,
                                       nn_input_patch_size[0]//2 - nn_output_patch_size[0]//2:
@@ -81,10 +85,22 @@ if net_weights_load:
     logging.info('LOADING PREVIOUS WEIGHTS OF MODEL: {}'.format(net_weights_load))
     model.load_weights(net_weights_load)
 
+
+# datagen = ImageDataGenerator(
+#     featurewise_center=True,
+#     featurewise_std_normalization=True,
+#     rotation_range=20,
+#     width_shift_range=0.2,
+#     height_shift_range=0.2,
+#     horizontal_flip=True)
+#
+# model.fit_generator(datagen.flow(sat_patches, map_patches, batch_size=32),
+#                     steps_per_epoch=len(sat_patches), epochs=epochs)
+
 # FIT MODEL AND SAVE WEIGHTS
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 # tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
                              'w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}_valjaccard{val_jaccard_coef:.4f}.hdf5'),
-                             monitor='val_loss', save_best_only=False)
-model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.2)
+                             monitor='val_jaccard_coef', save_best_only=True)
+model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=32, validation_split=0.1)
