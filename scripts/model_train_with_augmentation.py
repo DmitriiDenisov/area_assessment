@@ -7,7 +7,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from sklearn.feature_extraction.image import *
 from sklearn.metrics import jaccard_similarity_score
 from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.images_processing.patching import array2patches
+from area_assesment.images_processing.patching import array2patches, rotateImage
 from area_assesment.io_operations.visualization import plot_img_mask
 from area_assesment.neural_networks.cnn import *
 import hashlib
@@ -39,7 +39,7 @@ net_weights_dir_save = os.path.normpath('../weights/cnn_circle_farms/')
 ########################################################
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = os.path.normpath('../sakaka_data/circle_farms/train/')  # '../../data/mass_buildings/train/'
+dir_train = os.path.normpath('/storage/_pdata/sakaka/circle_farms/train/')  # '../../data/mass_buildings/train/'
 dir_train_sat = os.path.join(dir_train, 'sat/')
 dir_train_map = os.path.join(dir_train, 'map/')
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
@@ -76,8 +76,27 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     logging.debug('sat_patches.shape: {}'.format(img_sat_patches.shape))
     logging.debug('img_map_patches.shape: {}'.format(img_map_patches.shape))
     sat_patches, map_patches = np.append(sat_patches, img_sat_patches, 0), np.append(map_patches, img_map_patches, 0)
-logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
-logging.debug('map_patches.shape: {}'.format(map_patches.shape))
+print('sat_patches.shape: {}'.format(sat_patches.shape))
+print('map_patches.shape: {}'.format(map_patches.shape))
+
+print('augmenting images...')
+angles = [90, 180, 270]
+init_shape_sat = sat_patches.shape
+init_shape_map = map_patches.shape
+for k in range(len(angles)):
+    print('rotating by {} degrees'.format(angles[k]))
+    sat_patches_rotate = np.zeros(init_shape_sat, np.float32)
+    map_patches_rotate = np.zeros(init_shape_map, np.float32)
+    for i in range(init_shape_sat[0]):
+        for j in range(init_shape_sat[-1]):
+            sat_patches_rotate[i, :, :, j] = rotateImage(sat_patches[i, :, :, j], angles[k])
+        map_patches_rotate[i, :, :] = rotateImage(map_patches[i, :, :], angles[k])
+    sat_patches, map_patches = np.append(sat_patches, sat_patches_rotate, 0), \
+                               np.append(map_patches, map_patches_rotate, 0)
+
+print('augmented sat_patches.shape: {}'.format(sat_patches.shape))
+print('augmented map_patches.shape: {}'.format(map_patches.shape))
+
 #
 #
 # # LOADING PREVIOUS WEIGHTS OF MODEL
@@ -85,8 +104,6 @@ logging.debug('map_patches.shape: {}'.format(map_patches.shape))
 #     logging.info('LOADING PREVIOUS WEIGHTS OF MODEL: {}'.format(net_weights_load))
 #     model.load_weights(net_weights_load)
 
-
-datagen = ImageDataGenerator(rotation_range=90)
 
 # FIT MODEL AND SAVE WEIGHTS
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
