@@ -5,6 +5,16 @@
   <option name="CONSOLE_FONT_SIZE" value="12" />
   <option name="EDITOR_FONT_NAME" value="Monospaced" />
   <attributes>
+    <option name="PY.BUILTIN_NAME">
+      <value>
+        <option name="FOREGROUND" value="a5a5eb" />
+      </value>
+    </option>
+    <option name="PY.COMMA">
+      <value>
+        <option name="FOREGROUND" value="a6ef67" />
+      </value>
+    </option>
     <option name="PY.FUNC_DEFINITION">
       <value>
         <option name="FOREGROUND" value="d7efff" />
