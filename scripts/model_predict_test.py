@@ -15,37 +15,47 @@ from area_assesment.geo.geotiff_utils import write_geotiff
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
-# # MODEL builidings
-# model = cnn_v7()
-# # model.summary()
-# net_weights_load = '../weights/cnn_v7/w_epoch06_jaccard0.4800_valjaccard0.1533.hdf5'
-# logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
-# model.load_weights(net_weights_load)
-#
-# # PATCHING SETTINGS buildings
-# nn_input_patch_size = (64, 64)
-# step_size = 32
-# nn_output_patch_size = (32, 32)
-
-# # MODEL circle farms
-model = cnn_circle_farms()
+# MODEL builidings
+model = cnn_v7()
 # model.summary()
-net_weights_load = '../weights/cnn_circle_farms/w_epoch99_jaccard0.6824_valjaccard0.4247.hdf5'
+net_weights_load = '../weights/cnn_v7/sakaka_cnn_v7_jaccard0.2528_valjaccard0.0406.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
-# PATCHING SETTINGS circle farms
-nn_input_patch_size = (1024, 1024)  # (1024, 1024)  # (64, 64)
-nn_output_patch_size = (128, 128)  # (256, 256) # (16, 16)
-step_size = 128  # 256  # 16
+# PATCHING SETTINGS buildings
+nn_input_patch_size = (64, 64)
+nn_output_patch_size = (32, 32)
+subpatch_size = (16, 16)
+step_size = 16
+
+dir_valid = os.path.normpath('../sakaka_data/buildings/test/')  # '../../data/mass_buildings/valid/'
+output_folder = os.path.normpath('../sakaka_data/buildings/output/')
+########################################################
+
+
+# # MODEL circle farms
+# model = cnn_circle_farms()
+# # model.summary()
+# net_weights_load = '../weights/cnn_circle_farms/w_epoch24_jaccard0.1119_valjaccard0.1708.hdf5'
+# logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
+# model.load_weights(net_weights_load)
+#
+# # PATCHING SETTINGS circle farms
+# nn_input_patch_size = (1024, 1024)  # (1024, 1024)  # (64, 64)
+# nn_output_patch_size = (256, 256)  # (256, 256) # (16, 16)
+# subpatch_size = (128, 128)
+# step_size = 128  # 256  # 16
+#
+# dir_valid = os.path.normpath('../sakaka_data/circle_farms/test/')  # '../../data/mass_buildings/valid/'
+# output_folder = os.path.normpath('../sakaka_data/circle_farms/output/')
+#########################################################
+
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
-# dir_valid = os.path.normpath('../sakaka_data/test/')  # '../../data/mass_buildings/valid/'
-# dir_valid_sat = os.path.join(dir_valid, 'sat/')
-dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
+dir_valid_sat = os.path.join(dir_valid, 'sat/')
+# dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
 valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')
-output_folder = '../sakaka_data/output/sakaka_test/'
 
 for i, f_sat in enumerate(valid_sat_files):
     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(valid_sat_files), f_sat))
@@ -72,8 +82,18 @@ for i, f_sat in enumerate(valid_sat_files):
     # for i in range(sat_patches.shape[0]):
     #     plot_img_mask(sat_patches[i], map_patches_pred[i], show_plot=True)
 
+    # map_pred = patches2array(map_patches_pred, img_size=img_sat.shape[:2], step_size=step_size,
+    #                          nn_input_patch_size=nn_input_patch_size, nn_output_patch_size=nn_output_patch_size)
+
+    map_patches_pred = map_patches_pred[:,
+                                        nn_output_patch_size[0] // 2 - subpatch_size[0] // 2:
+                                        nn_output_patch_size[0] // 2 + subpatch_size[0] // 2,
+                                        nn_output_patch_size[1] // 2 - subpatch_size[1] // 2:
+                                        nn_output_patch_size[1] // 2 + subpatch_size[1] // 2]
+
     map_pred = patches2array(map_patches_pred, img_size=img_sat.shape[:2], step_size=step_size,
-                             nn_input_patch_size=nn_input_patch_size, nn_output_patch_size=nn_output_patch_size)
+                             nn_input_patch_size=nn_input_patch_size, nn_output_patch_size=subpatch_size)
+
     logging.debug('map_pred.shape: {}'.format(map_pred.shape))
     map_pred = map_pred[nn_input_patch_size[0]:nn_input_patch_size[0] + img_size[0],
                         nn_input_patch_size[1]:nn_input_patch_size[1] + img_size[1]]
@@ -90,7 +110,7 @@ for i, f_sat in enumerate(valid_sat_files):
     #          show_plot=False, save_output_path=output_folder)
 
     # WRITE GEOTIFF
-    geotiff_output_path = output_folder+'{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4])
+    geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4]))
     write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
 
     # np.save('{}_OVERLAY_GRABCUT_stepsize{}.npy'.format(f_sat.split('/')[-1][:-4], step_size), map_pred)

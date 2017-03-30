@@ -150,8 +150,6 @@ def cnn_v7():
     model.add(Conv2D(filters=1, kernel_size=3, strides=1, activation='sigmoid'))
     model.add(MaxPooling2D(pool_size=2, strides=1))
 
-    # model.add(Flatten())
-    # model.add(Dense(16 ** 2, activation='sigmoid'))
     model.add(Reshape((32, 32)))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', jaccard_coef])
     return model
@@ -185,46 +183,25 @@ def cnn_v8():
 
 def cnn_circle_farms():
     model = Sequential()
-    # model.add(BatchNormalization(input_shape=(1024, 1024, 3)))
-    model.add(MaxPooling2D(pool_size=16, strides=16, input_shape=(1024, 1024, 3)))
-    # model.add(Conv2D(filters=16, kernel_size=17, strides=4, activation='relu'))#, input_shape=(1024, 1024, 3)))
-    # model.add(MaxPooling2D(pool_size=2, strides=1))
-    # model.add(Conv2D(filters=32, kernel_size=7, strides=1, activation='relu'))
-    # model.add(MaxPooling2D(pool_size=2, strides=1))
-    # # model.add(Conv2D(filters=24, kernel_size=3, strides=1, activation='relu'))
-    # # model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-    #
-    # model.add(Conv2D(filters=1, kernel_size=5, strides=1, activation='sigmoid'))
-    # model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-    # model.add(UpSampling2D(size=8))
-
-
-    model.add(BatchNormalization(input_shape=(64, 64, 3)))
-    model.add(Conv2D(filters=32, kernel_size=9, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=64, kernel_size=7, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=128, kernel_size=5, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=256, kernel_size=5, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=1, kernel_size=3, strides=1, activation='sigmoid'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-
+    model.add(AveragePooling2D(pool_size=4, strides=4, input_shape=(1024, 1024, 3)))
+    model.add(Conv2D(filters=64, kernel_size=13, strides=2, padding='same', activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=2, padding='same'))
+    model.add(Conv2D(filters=128, kernel_size=7, strides=1, padding='same', activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
+    model.add(Conv2D(filters=96, kernel_size=5, strides=1, padding='same', activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
+    model.add(Conv2D(filters=1, kernel_size=1, activation='sigmoid'))
     model.add(UpSampling2D(size=4))
-
-
-    model.add(Reshape((128, 128)))
+    model.add(Reshape((256, 256)))
 
     # model.add(Flatten())
     # model.add(Dense(16 ** 2, activation='sigmoid'))
     # model.add(Reshape((16, 16)))
 
     # opt = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', jaccard_coef])
+    model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy', jaccard_coef])
     return model
+
 
 
 def baseline_model():

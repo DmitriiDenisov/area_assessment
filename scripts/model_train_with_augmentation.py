@@ -20,8 +20,6 @@ import hashlib
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
-
-
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
 model = cnn_circle_farms()

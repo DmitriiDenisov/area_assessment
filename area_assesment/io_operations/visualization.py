@@ -1,7 +1,7 @@
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import logging
-# import matplotlib
-# matplotlib.use('Agg')
 
 
 def plot_img(img, name=None, show_plot=False, save_output_path=None):
@@ -15,7 +15,7 @@ def plot_img(img, name=None, show_plot=False, save_output_path=None):
     if save_output_path:
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=1000)
+        plt.savefig(filename, dpi=700)
 
 
 def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_output_path=None):
