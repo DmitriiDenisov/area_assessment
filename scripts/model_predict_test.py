@@ -10,59 +10,73 @@ from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.io_operations.visualization import plot_img_mask_pred, plot_img_mask, plot_img
 from area_assesment.neural_networks.cnn import *
 from area_assesment.geo.geotiff_utils import write_geotiff
+from area_assesment.images_processing.normalization import equalizeHist_rgb
+from area_assesment.neural_networks.unet import get_unet
 
 
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
 # # MODEL builidings
-# model = cnn_v7()
-# # model.summary()
-# net_weights_load = '../weights/cnn_v7/w_epoch06_jaccard0.4800_valjaccard0.1533.hdf5'
+# model = cnn_v8((32, 32, 3))  # get_unet(64, 64, 3)
+# model.summary()
+# net_weights_load = '../weights/cnn_v8/32x32_weights_epoch25_jaccard0.2822_valjaccard0.0366.hdf5'
 # logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 # model.load_weights(net_weights_load)
 #
 # # PATCHING SETTINGS buildings
-# nn_input_patch_size = (64, 64)
-# step_size = 32
+# nn_input_patch_size = (32, 32)
 # nn_output_patch_size = (32, 32)
+# subpatch_size = (32, 32)
+# step_size = 32
+#
+# dir_valid = os.path.normpath('../sakaka_data/buildings/test/')  # '../../data/mass_buildings/valid/'
+# output_folder = os.path.normpath('../sakaka_data/buildings/output/')
+########################################################
 
-# # MODEL circle farms
-model = cnn_circle_farms()
+
+# MODEL circle farms
+model = cnn_circle_farms((512, 512, 3))
 # model.summary()
-net_weights_load = '../weights/cnn_circle_farms/w_epoch99_jaccard0.6824_valjaccard0.4247.hdf5'
+net_weights_load = '../weights/cnn_circle_farms/circle_farms_512x512_MaxPool_weights_epoch31_jaccard0.3207_valjaccard0.1269.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
 # PATCHING SETTINGS circle farms
-nn_input_patch_size = (1024, 1024)  # (1024, 1024)  # (64, 64)
-nn_output_patch_size = (128, 128)  # (256, 256) # (16, 16)
-step_size = 128  # 256  # 16
+nn_input_patch_size = (512, 512)
+nn_output_patch_size = (512, 512)
+subpatch_size = (256, 256)
+step_size = 256
+
+# dir_valid = os.path.normpath('../sakaka_data/circle_farms/test/')  # '../../data/mass_buildings/valid/'
+output_folder = os.path.normpath('../sakaka_data/circle_farms/output/')
+#########################################################
+
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
-# dir_valid = os.path.normpath('../sakaka_data/test/')  # '../../data/mass_buildings/valid/'
 # dir_valid_sat = os.path.join(dir_valid, 'sat/')
-dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
+dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal_B_1m/')
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
 valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')
-output_folder = '../sakaka_data/output/sakaka_test/'
 
 for i, f_sat in enumerate(valid_sat_files):
     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(valid_sat_files), f_sat))
+
     img_sat_ = cv2.imread(f_sat)  # [-500:, -1000:]
+    img_sat = equalizeHist_rgb(img_sat_)
+    img_sat = img_sat.astype('float32')
+    img_sat = (img_sat - img_sat.mean()) / img_sat.std()  # img_sat /= 255
+
+    img_size = img_sat_.shape[:2]
+    img_sat_upscale = np.empty(((round(img_size[0] / nn_input_patch_size[0]) + 2) * nn_input_patch_size[0],
+                                (round(img_size[1] / nn_input_patch_size[1]) + 2) * nn_input_patch_size[1], 3))
+    img_sat_upscale[nn_input_patch_size[0]:nn_input_patch_size[0] + img_size[0],
+                    nn_input_patch_size[1]:nn_input_patch_size[1] + img_size[1]] = img_sat
 
     logging.debug('raw img_sat_.shape: {}'.format(img_sat_.shape))
-    img_size = img_sat_.shape[:2]
-    img_sat = np.empty(((round(img_size[0] / nn_input_patch_size[0]) + 2) * nn_input_patch_size[0],
-                        (round(img_size[1] / nn_input_patch_size[1]) + 2) * nn_input_patch_size[1], 3))
-    img_sat[nn_input_patch_size[0]:nn_input_patch_size[0] + img_size[0],
-            nn_input_patch_size[1]:nn_input_patch_size[1] + img_size[1]] = img_sat_
-
     logging.debug('oversized img_sat.shape: {}'.format(img_sat.shape))
-    img_sat = img_sat.astype('float32')
-    img_sat /= 255
 
-    sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
+    sat_patches = array2patches(img_sat_upscale, patch_size=nn_input_patch_size, step_size=step_size)
     logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
 
     logging.info('PREDICTING, sat_patches.shape:{}'.format(sat_patches.shape))
@@ -72,8 +86,18 @@ for i, f_sat in enumerate(valid_sat_files):
     # for i in range(sat_patches.shape[0]):
     #     plot_img_mask(sat_patches[i], map_patches_pred[i], show_plot=True)
 
-    map_pred = patches2array(map_patches_pred, img_size=img_sat.shape[:2], step_size=step_size,
-                             nn_input_patch_size=nn_input_patch_size, nn_output_patch_size=nn_output_patch_size)
+    # map_pred = patches2array(map_patches_pred, img_size=img_sat.shape[:2], step_size=step_size,
+    #                          nn_input_patch_size=nn_input_patch_size, nn_output_patch_size=nn_output_patch_size)
+
+    map_patches_pred = map_patches_pred[:,
+                                        nn_output_patch_size[0] // 2 - subpatch_size[0] // 2:
+                                        nn_output_patch_size[0] // 2 + subpatch_size[0] // 2,
+                                        nn_output_patch_size[1] // 2 - subpatch_size[1] // 2:
+                                        nn_output_patch_size[1] // 2 + subpatch_size[1] // 2]
+
+    map_pred = patches2array(map_patches_pred, img_size=img_sat_upscale.shape[:2], step_size=step_size,
+                             nn_input_patch_size=nn_input_patch_size, nn_output_patch_size=subpatch_size)
+
     logging.debug('map_pred.shape: {}'.format(map_pred.shape))
     map_pred = map_pred[nn_input_patch_size[0]:nn_input_patch_size[0] + img_size[0],
                         nn_input_patch_size[1]:nn_input_patch_size[1] + img_size[1]]
@@ -90,7 +114,7 @@ for i, f_sat in enumerate(valid_sat_files):
     #          show_plot=False, save_output_path=output_folder)
 
     # WRITE GEOTIFF
-    geotiff_output_path = output_folder+'{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4])
+    geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(f_sat.split('/')[-1][:-4]))
     write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
 
     # np.save('{}_OVERLAY_GRABCUT_stepsize{}.npy'.format(f_sat.split('/')[-1][:-4], step_size), map_pred)
