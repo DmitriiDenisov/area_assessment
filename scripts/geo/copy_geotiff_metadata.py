@@ -24,7 +24,7 @@ except:
 src_dir = os.path.normpath(args.src_dir)
 dst_dir = os.path.normpath(args.dest_dir)
 
-for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.path.join(src_dir, f))]:
+for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.path.join(os.path.dirname(src_dir), f))]:
     src_path = os.path.join(os.path.dirname(src_dir), f)
     dst_path = os.path.join(dst_dir, f)
 

@@ -25,18 +25,18 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
-model = unet(64, 64, 3)  # cnn_circle_farms((512, 512, 3))
+model = cnn_v7()  # unet(64, 64, 3)  # cnn_circle_farms((512, 512, 3))
 model.summary()
 
 # PATCHING SETTINGS
 nn_input_patch_size = (64, 64)  # (1024, 1024)  # (64, 64)
-nn_output_patch_size = (64, 64)  # (256, 256) # (16, 16)
+nn_output_patch_size = (32, 32)  # (256, 256) # (16, 16)
 # step_size = 16  # 256  # 16
 
 # MODEL SETTINGS
 epochs = 100
-net_weights_load = None  # os.path.normpath('../weights/buidlins/circle_farms_512x512_weights_epoch18_jaccard0.5356_valjaccard0.2397.hdf5')
-net_weights_dir_save = os.path.normpath('../weights/unet/')
+net_weights_load = os.path.normpath('../weights/cnn_v7/cnn_v7_buildings_weights_epoch08_loss0.0192_valloss0.0448.hdf5')
+net_weights_dir_save = os.path.normpath('../weights/cnn_v7/')
 ########################################################
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
@@ -55,7 +55,7 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_sat_ = cv2.imread(f_sat)
     img_sat = equalizeHist_rgb(img_sat_)
     img_sat = img_sat.astype('float32')
-    img_sat = (img_sat - img_sat.mean()) / img_sat.std()  # img_sat /= 255
+    img_sat /= 255  # img_sat = (img_sat - img_sat.mean()) / img_sat.std()  # img_sat /= 255
 
     img_map_ = cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
     ret, img_map = cv2.threshold(img_map_.astype(np.uint8), 127, 255, cv2.THRESH_BINARY)
@@ -71,8 +71,8 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
 
     # img_sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     # img_map_patches = array2patches(img_map, patch_size=nn_input_patch_size, step_size=step_size)
-    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=1000, random_state=3)
-    img_map_patches = extract_patches_2d(img_map, nn_input_patch_size, max_patches=1000, random_state=3)
+    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=20000, random_state=2)
+    img_map_patches = extract_patches_2d(img_map, nn_input_patch_size, max_patches=20000, random_state=2)
 
     # for (sat_patch, map_patch) in list(zip(img_sat_patches, img_map_patches)):
     #     logging.debug(sat_patch.shape, map_patch.shape)
@@ -101,6 +101,6 @@ if net_weights_load:
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 # tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                             'circle_farms_512x512_weights_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}_valjaccard{val_jaccard_coef:.4f}.hdf5'),
+                             'cnn_v7_buildings_weights_epoch{epoch:02d}_loss{loss:.4f}_valloss{val_loss:.4f}.hdf5'),
                              monitor='val_loss', save_best_only=False)
 model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.1)

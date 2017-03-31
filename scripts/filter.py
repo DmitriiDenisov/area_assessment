@@ -16,21 +16,8 @@ from area_assesment.neural_networks.unet import unet
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
-# MODEL builidings
-model = cnn_v7()  # get_unet(64, 64, 3)
-model.summary()
-net_weights_load = '../weights/cnn_v7/cnn_v7_buildings_weights_epoch08_loss0.0192_valloss0.0448.hdf5'
-logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
-model.load_weights(net_weights_load)
-
-# PATCHING SETTINGS buildings
-nn_input_patch_size = (64, 64)
-nn_output_patch_size = (32, 32)
-subpatch_size = (32, 32)
-step_size = 32
 
 dir_valid = os.path.normpath('../sakaka_data/buildings/test/')  # '../../data/mass_buildings/valid/'
-dir_valid_sat = os.path.join(dir_valid, 'sat/')
 output_folder = os.path.normpath('../sakaka_data/buildings/output/')
 ########################################################
 
@@ -54,6 +41,7 @@ output_folder = os.path.normpath('../sakaka_data/buildings/output/')
 
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
+dir_valid_sat = os.path.join(dir_valid, 'sat/')
 # dir_valid_sat = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal_B_1m/')
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_valid_sat))
 valid_sat_files = filenames_in_dir(dir_valid_sat, endswith_='.tif')
