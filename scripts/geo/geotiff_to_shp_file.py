@@ -14,7 +14,7 @@ from area_assesment.images_processing.polygons import mask_to_polygons
 parser = argparse.ArgumentParser(description='Creates ESRI shapefile from GeoTIFFs images with mask.')
 parser.add_argument('src_dir', metavar='src_dir', type=str,
                     help='source file or files mask')
-parser.add_argument('dst_shp', metavar='dst_shp', type=str,
+parser.add_argument('dst_dir', metavar='dst_dir', type=str,
                     help='destination shape file path')
 parser.add_argument('-v', '--verbose', dest='v', action='store_const',
                     const=True, default=False,
@@ -39,8 +39,8 @@ except:
 
 gdal.AllRegister()
 
-src_dir = os.path.normpath(args.src_dir)
-dst_dir = os.path.normpath(args.dst_shp)
+src_dir = os.path.abspath(os.path.normpath(args.src_dir))
+dst_dir = os.path.abspath(os.path.normpath(args.dst_dir))
 
 polygons_list = []
 
@@ -51,10 +51,10 @@ for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.p
     mask = cv2.imread(cur_file_path, cv2.IMREAD_GRAYSCALE)
     if mask is None:
         continue
-    mask[mask < floor(0.3 * 255)] = 0
-    mask[mask >= floor(0.3 * 255)] = 1
+    mask[mask < floor(args.m_thre * 255)] = 0
+    mask[mask >= floor(args.m_thre * 255)] = 1
 
-    image_polygons = mask_to_polygons(mask, epsilon=2, min_area=2, rect_polygon=True)
+    image_polygons = mask_to_polygons(mask, epsilon=1, min_area=0.02, rect_polygon=False)
 
     gdal_ds = gdal.Open(cur_file_path, GA_ReadOnly)
     top_left_x = gdal_ds.GetGeoTransform()[0]
@@ -75,7 +75,10 @@ for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.p
 mult_p = MultiPolygon(polygons_list)
 
 driver = ogr.GetDriverByName('ESRI Shapefile')
-ds = driver.CreateDataSource(args.dst_shp)
+driver_c = ogr.GetDriverByName('ESRI Shapefile')
+
+ds = driver.CreateDataSource(os.path.join(dst_dir,"{}.shp".format(args.ln)))
+ds_c = driver_c.CreateDataSource(os.path.join(dst_dir,"{}-centroids.shp".format(args.ln)))
 
 source_srs = osr.SpatialReference()
 source_srs.ImportFromWkt(projection_wkt)
@@ -92,8 +95,17 @@ else:
 # create new layer definition and define columns
 # of attribute table
 layer = ds.CreateLayer(args.ln, srs, ogr.wkbMultiPolygon)
-layer.CreateField(ogr.FieldDefn("Name", ogr.OFTString))
-layer.CreateField(ogr.FieldDefn("Area", ogr.OFTReal))
+layer.CreateField(ogr.FieldDefn("name", ogr.OFTString))
+layer.CreateField(ogr.FieldDefn("key", ogr.OFTString))
+layer.CreateField(ogr.FieldDefn("area", ogr.OFTReal))
+layer.CreateField(ogr.FieldDefn("totalArea", ogr.OFTReal))
+layer.CreateField(ogr.FieldDefn("totalCount", ogr.OFTInteger))
+
+layer_c = ds_c.CreateLayer(args.ln+"_centroids", srs, ogr.wkbPoint)
+layer_c.CreateField(ogr.FieldDefn("name", ogr.OFTString))
+layer_c.CreateField(ogr.FieldDefn("area", ogr.OFTReal))
+
+total_area = 0.0
 
 for i, p in enumerate(mult_p):
     # create bew feature
@@ -104,12 +116,34 @@ for i, p in enumerate(mult_p):
     geom_poly.Transform(transform)
     # set the feature geometry and attributes
     feature.SetGeometry(geom_poly)
-    feature.SetField("Area", geom_poly.GetArea())
-    feature.SetField("Name", "{}_{}".format(args.fn, i))
+    feature.SetField("area", geom_poly.GetArea())
+    total_area = total_area + geom_poly.GetArea()
+    feature.SetField("name", "{}_{}".format(args.fn, i))
+    feature.SetField("key", "{}_{}".format(args.fn, i))
+    feature.SetField("totalCount", len(mult_p))
     # add the feature in the layer
     layer.CreateFeature(feature)
     # Dereference the feature
+
+    #
+    feature_c = ogr.Feature(layer_c.GetLayerDefn())
+    centroid = geom_poly.Centroid()
+    feature_c.SetGeometry(centroid)
+    feature_c.SetField("area", geom_poly.GetArea())
+    feature_c.SetField("name", "{}_{}".format(args.fn, i))
+
+    layer_c.CreateFeature(feature_c)
+
+    feature_c = None
     feature = None
+
+# terrible workaround to store total area and count of features of mapbox
+for i in range(layer.GetFeatureCount()):
+    feature = layer.GetFeature(i)
+    feature.SetField("totalArea", total_area)
+    layer.SetFeature(feature)
+
 
 # Save and close everything
 ds = layer = feat = geom = None
+ds_c = layer_c = None
