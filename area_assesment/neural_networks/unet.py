@@ -31,12 +31,15 @@ def unet(patch_height, patch_width, n_ch):
     conv5 = Dropout(0.2)(conv5)
     conv5 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(conv5)
     # #
-    conv6 = Convolution2D(1, 1, 1, activation='relu', border_mode='same')(conv5)
-    conv6 = core.Reshape((patch_height, patch_width))(conv6)
+    conv6 = Convolution2D(2, 1, 1, activation='relu', border_mode='same')(conv5)
+    conv6 = core.Reshape((patch_height*patch_width, 2))(conv6)
     # ############
-    conv7 = core.Activation('sigmoid')(conv6)
+    conv7 = core.Activation('softmax')(conv6)
+    # conv7 = core.Permute((2, 1))(conv7)
+    conv7 = core.Reshape((patch_height, patch_width, 2))(conv7)
+
 
     model = Model(input=inputs, output=conv7)
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
-    model.compile(optimizer=sgd, loss='binary_crossentropy', metrics=['accuracy', jaccard_coef])
+    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy', jaccard_coef])
     return model
