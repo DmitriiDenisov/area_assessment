@@ -11,7 +11,7 @@ from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.images_processing.patching import array2patches
 from area_assesment.io_operations.visualization import plot_img_mask, plot_img_mask_pred
 from area_assesment.neural_networks.cnn import *
-from area_assesment.neural_networks.unet import unet
+from area_assesment.neural_networks.unet import *
 import hashlib
 
 #########################################################
@@ -25,7 +25,7 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
-model = unet(64, 64, 3)
+model = unet(64, 64, 3)  # unet_circle_farms(256, 256, 3) #unet(64, 64, 3)
 model.summary()
 
 # PATCHING SETTINGS
@@ -35,13 +35,13 @@ nn_output_patch_size = (64, 64)  # (256, 256) # (16, 16)
 patches_per_img = 1000
 
 # MODEL SETTINGS
-epochs = 100
-net_weights_load = None  # os.path.normpath('../weights/cnn_v7/good_weigths_jaccard0.2339_valjaccard0.0230.hdf5')
+epochs = 10
+net_weights_load = None  # os.path.normpath('../weights/unet/unet_weights_epoch01_jaccard0.9510_valjaccard0.9946.hdf5')
 net_weights_dir_save = os.path.normpath('../weights/unet/')
 ########################################################
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = os.path.normpath('../sakaka_data/buildings/Dawmat_Al_Jandal/')  # '../../data/mass_buildings/train/'
+dir_train = os.path.normpath('../sakaka_data/circle_farms/train/')
 dir_train_sat = os.path.join(dir_train, 'sat/')
 dir_train_map = os.path.join(dir_train, 'map/')
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
@@ -52,13 +52,19 @@ sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1], 2))
 for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_map_files), f_sat, f_map))
-    img_sat, img_map = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
-    # img_sat = equalizeHist_rgb(img_sat_)
+    img_sat_, img_map_ = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
+    img_size = img_sat_.shape[:2]
+    logging.debug('img_sat_.shape: {}, img_map_.shape: {}'.format(img_sat_.shape, img_map_.shape))
+
+    plot_img_mask(img_sat_, img_map_, show_plot=True)
+    dim = (512, int(img_size[0] * (512.0/img_size[1])))
+    img_sat = cv2.resize(img_sat_, dim, interpolation=cv2.INTER_AREA)
+    img_map = cv2.resize(img_map_, dim, interpolation=cv2.INTER_AREA)
+
+    plot_img_mask(img_sat, img_map, show_plot=True)
     # img_sat, img_map = img_sat[-1000:, -1000:], img_map[-1000:, -1000:]
     logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
-    # print('Hash img_sat: ', hashlib.sha1(img_sat.view(np.uint8)).hexdigest())
-    # print('Hash img_map: ', hashlib.sha1(img_map.view(np.uint8)).hexdigest())
-    logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
+
     img_sat = img_sat.astype('float32')
     ret, img_map = cv2.threshold(img_map.astype(np.uint8), 127, 255, cv2.THRESH_BINARY)
     img_map = img_map.astype('float32')
@@ -103,6 +109,6 @@ if net_weights_load:
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 # tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                             'w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}_valjaccard{val_jaccard_coef:.4f}.hdf5'),
+                             'circlefarms-unet_adam_64_epoch{epoch:02d}_iu{jaccard_coef:.4f}_val_iu{val_jaccard_coef:.4f}.hdf5'),
                              monitor='val_loss', save_best_only=False)
-model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=32, validation_split=0.1)
+model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.1)
