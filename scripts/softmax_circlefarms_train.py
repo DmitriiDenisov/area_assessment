@@ -25,18 +25,17 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
-model = unet(64, 64, 3)  # unet_circle_farms(256, 256, 3) #unet(64, 64, 3)
+model = unet(64, 64, 3)
 model.summary()
 
 # PATCHING SETTINGS
-nn_input_patch_size = (64, 64)  # (1024, 1024)  # (64, 64)
-nn_output_patch_size = (64, 64)  # (256, 256) # (16, 16)
-# step_size = 16  # 256  # 16
-patches_per_img = 1000
+nn_input_patch_size = (512, 512)  # (1024, 1024)  # (64, 64)
+nn_output_patch_size = (256, 256)  # (256, 256) # (16, 16)
+patches_per_img = 2000
 
 # MODEL SETTINGS
-epochs = 10
-net_weights_load = None  # os.path.normpath('../weights/unet/unet_weights_epoch01_jaccard0.9510_valjaccard0.9946.hdf5')
+epochs = 50
+net_weights_load = None  # os.path.normpath('../weights/unet/circlefarms-unet_adam_64_epoch249_iu0.8273_val_iu0.8001.hdf5')
 net_weights_dir_save = os.path.normpath('../weights/unet/')
 ########################################################
 
@@ -55,15 +54,15 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_sat_, img_map_ = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
     img_size = img_sat_.shape[:2]
     logging.debug('img_sat_.shape: {}, img_map_.shape: {}'.format(img_sat_.shape, img_map_.shape))
+    # plot_img_mask(img_sat_, img_map_, show_plot=True)
 
-    plot_img_mask(img_sat_, img_map_, show_plot=True)
-    dim = (512, int(img_size[0] * (512.0/img_size[1])))
+    dim = (1024, int(img_size[0] * (1024.0/img_size[1])))
     img_sat = cv2.resize(img_sat_, dim, interpolation=cv2.INTER_AREA)
     img_map = cv2.resize(img_map_, dim, interpolation=cv2.INTER_AREA)
 
-    plot_img_mask(img_sat, img_map, show_plot=True)
+    # plot_img_mask(img_sat, img_map, show_plot=True)
     # img_sat, img_map = img_sat[-1000:, -1000:], img_map[-1000:, -1000:]
-    logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
+    # logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
 
     img_sat = img_sat.astype('float32')
     ret, img_map = cv2.threshold(img_map.astype(np.uint8), 127, 255, cv2.THRESH_BINARY)
@@ -75,9 +74,9 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_map_2 = np.ones(img_map.shape) - img_map.copy()
     # plot_img_mask(img_map_1, img_map_2, show_plot=True)
 
-    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=1)
-    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=1)
-    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=1)
+    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=5)
+    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=5)
+    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=5)
 
     # for (sat_patch, map_1_patch, map_2_patch) in list(zip(img_sat_patches, img_map_1_patches, img_map_2_patches)):
     #     logging.debug(sat_patch.shape, map_1_patch.shape)

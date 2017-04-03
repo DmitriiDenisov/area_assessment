@@ -1,3 +1,4 @@
+import os
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -18,7 +19,7 @@ def plot_img(img, name=None, show_plot=False, save_output_path=None):
         plt.savefig(filename, dpi=700)
 
 
-def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_output_path=None):
+def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_output_path=None, dpi=700):
     if overlay:
         fig = plt.figure(frameon=False, figsize=(10, 10))
         ax = plt.Axes(fig, [0., 0., 1., 1.])
@@ -36,9 +37,9 @@ def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False
     if show_plot:
         plt.show()
     if save_output_path:
-        filename = save_output_path + name + '.png'
+        filename = save_output_path + '/' + name + '.png'
         logging.info('PLOT: {}'.format(filename))
-        plt.savefig(filename, dpi=1000)
+        plt.savefig(filename, dpi=dpi)
 
 
 def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=False, save_output_path=None):

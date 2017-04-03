@@ -26,12 +26,12 @@ model.load_weights(net_weights_load)
 # PATCHING SETTINGS buildings
 nn_input_patch_size = (64, 64)
 nn_output_patch_size = (64, 64)
-subpatch_size = (48, 48)
-step_size = 32
+subpatch_size = (32, 32)
+step_size = 16
 
-dir_test = os.path.normpath('../sakaka_data/buildings/test/sat/')  # '../../data/mass_buildings/valid/'
-# dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
-output_folder = os.path.normpath('../sakaka_data/buildings/output/')
+# dir_test = os.path.normpath('../sakaka_data/buildings/test/sat/')  # '../../data/mass_buildings/valid/'
+dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal_B_1m/')
+output_folder = os.path.normpath('../sakaka_data/buildings/output/unet_weigths_epoch01_subpatch32_stepsize16/')
 ########################################################
 
 
@@ -43,7 +43,6 @@ for i, f_sat in enumerate(valid_sat_files):
     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(valid_sat_files), f_sat))
 
     img_sat_ = cv2.imread(f_sat)  # [-500:, -1000:]
-    # img_sat = equalizeHist_rgb(img_sat_)
     img_sat = img_sat_.astype('float32')
     img_sat /= 255
 
