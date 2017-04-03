@@ -4,7 +4,7 @@ import logging
 
 
 def write_geotiff(path: str, raster_layers: np.array, gdal_ds: str):
-    logging.info('WRITING GEOTIFF')
+    logging.debug('WRITING GEOTIFF')
     gdal_ds = gdal.Open(gdal_ds)
     driver = gdal.GetDriverByName('GTiff')
     out_raster = driver.Create(path,
