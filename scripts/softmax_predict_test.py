@@ -26,19 +26,18 @@ model.load_weights(net_weights_load)
 # PATCHING SETTINGS buildings
 nn_input_patch_size = (64, 64)
 nn_output_patch_size = (64, 64)
-subpatch_size = (32, 32)
-step_size = 16
+subpatch_size = (64, 64)
+step_size = 64
 
 # dir_test = os.path.normpath('../sakaka_data/buildings/test/sat/')  # '../../data/mass_buildings/valid/'
 dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal_B_1m/')
-output_folder = os.path.normpath('../sakaka_data/buildings/output/unet_weigths_epoch01_subpatch32_stepsize16/')
+output_folder = os.path.normpath('../sakaka_data/buildings/output/unet_weigths_epoch01_subpatch64_stepsize64/')
 ########################################################
 
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_test))
-valid_sat_files = filenames_in_dir(dir_test, endswith_='.tif')
-
+valid_sat_files = filenames_in_dir(dir_test, endswith_='.tif')[56:57]
 for i, f_sat in enumerate(valid_sat_files):
     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(valid_sat_files), f_sat))
 
@@ -47,8 +46,8 @@ for i, f_sat in enumerate(valid_sat_files):
     img_sat /= 255
 
     img_size = img_sat_.shape[:2]
-    img_sat_upscale = np.empty(((round(img_size[0] / nn_input_patch_size[0]) + 1) * nn_input_patch_size[0],
-                                (round(img_size[1] / nn_input_patch_size[1]) + 1) * nn_input_patch_size[1], 3))
+    img_sat_upscale = np.empty(((round(img_size[0] / nn_input_patch_size[0]) + 2) * nn_input_patch_size[0],
+                                (round(img_size[1] / nn_input_patch_size[1]) + 2) * nn_input_patch_size[1], 3))
     img_sat_upscale[:, :, 0] = img_sat[:, :, 0].mean()
     img_sat_upscale[:, :, 1] = img_sat[:, :, 1].mean()
     img_sat_upscale[:, :, 2] = img_sat[:, :, 2].mean()
@@ -67,7 +66,7 @@ for i, f_sat in enumerate(valid_sat_files):
     logging.debug('map_patches_pred.shape: {}'.format(map_patches_pred.shape))
 
     # map_patches_pred = np.array([np.argmax(map_patches_pred[k], axis=2) for k in range(map_patches_pred.shape[0])])
-    map_patches_pred = map_patches_pred[:, :, :, 0]
+    map_patches_pred = map_patches_pred[:, :, :, 0] * 2
     logging.debug('2 map_patches_pred.shape: {}'.format(map_patches_pred.shape))
 
     # for i in range(sat_patches.shape[0]):

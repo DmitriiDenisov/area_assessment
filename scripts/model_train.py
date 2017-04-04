@@ -25,7 +25,7 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
-model = cnn_v7()  # unet(64, 64, 3)  # cnn_circle_farms((512, 512, 3))
+model = cnn_v7()  # unet(64, 64, 3)  # cnn_circlefarms((512, 512, 3))
 model.summary()
 
 # PATCHING SETTINGS

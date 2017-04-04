@@ -148,44 +148,6 @@ def cnn_v7():
     return model
 
 
-# def cnn_circle_farms(input_shape_):
-#     model = Sequential()
-#
-#     model.add(MaxPooling2D(input_shape=input_shape_, pool_size=8))
-#     # model.add(Conv2D(filters=3, kernel_size=1, strides=4, activation='relu', padding='same', input_shape=input_shape_))
-#
-#     model.add(BatchNormalization())
-#     model.add(Conv2D(filters=32, kernel_size=3, strides=1, activation='relu', padding='same'))
-#     model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-#     model.add(Dropout(0.1))
-#
-#     model.add(BatchNormalization())
-#     model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu', padding='same'))
-#     model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-#     model.add(Dropout(0.1))
-#
-#     model.add(BatchNormalization())
-#     model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu', padding='same'))
-#     model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-#     model.add(Dropout(0.1))
-#
-#     model.add(BatchNormalization())
-#     model.add(Conv2D(filters=96, kernel_size=3, strides=1, activation='relu', padding='same'))
-#     model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-#     model.add(Dropout(0.1))
-#
-#     model.add(BatchNormalization())
-#     model.add(Conv2D(filters=1, kernel_size=3, strides=1, activation='sigmoid', padding='same'))
-#     model.add(UpSampling2D(size=8))
-#     # model.add(Dropout(0.1))
-#
-#     model.add(Reshape(input_shape_[:2]))
-#     # opt = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-#     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', precision, recall,
-#                                                                          fmeasure, jaccard_coef])
-#     return model
-
-
 def cnn_v7_jb_rural():
     model = Sequential()
     model.add(BatchNormalization(input_shape=(64, 64, 3)))
@@ -207,75 +169,6 @@ def cnn_v7_jb_city():
     model.add(Conv2D(filters=1, kernel_size=1, strides=1, activation='sigmoid'))
     model.add(Reshape((64, 64)))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', jaccard_coef])
-    return model
-
-
-def cnn_v7_softmax():
-    model = Sequential()
-    model.add(BatchNormalization(input_shape=(64, 64, 3)))
-    model.add(Conv2D(filters=32, kernel_size=9, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=64, kernel_size=7, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=128, kernel_size=5, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=256, kernel_size=5, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=1, kernel_size=3, strides=1, activation='sigmoid'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-
-    model.add(Reshape((32, 32)))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', jaccard_coef])
-    return model
-
-
-def cnn_v8(input_shape_):
-    model = Sequential()
-    model.add(BatchNormalization(input_shape=input_shape_))
-
-    model.add(Conv2D(filters=32, kernel_size=3, strides=1, activation='relu', padding='same'))
-    model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-    model.add(Dropout(0.1))
-
-    model.add(Conv2D(filters=64, kernel_size=3, strides=1, activation='relu', padding='same'))
-    model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-    model.add(Dropout(0.1))
-
-    model.add(Conv2D(filters=128, kernel_size=3, strides=1, activation='relu', padding='same'))
-    model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-    model.add(Dropout(0.1))
-
-    model.add(Conv2D(filters=96, kernel_size=3, strides=1, activation='relu', padding='same'))
-    model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-    model.add(Dropout(0.1))
-
-    model.add(Conv2D(filters=1, kernel_size=3, strides=1, activation='sigmoid', padding='same'))
-    model.add(MaxPooling2D(pool_size=2, strides=1, padding='same'))
-    # model.add(Dropout(0.1))
-
-    model.add(Reshape(input_shape_[:2]))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', jaccard_coef])
-    return model
-
-
-def cnn_circle_farms():
-    model = Sequential()
-    model.add(BatchNormalization(input_shape=(256, 256, 3)))
-    model.add(AveragePooling2D(pool_size=4, strides=4))
-    model.add(Conv2D(filters=64, kernel_size=16, strides=4, activation='relu'))
-    model.add(MaxPooling2D(pool_size=2, strides=1))
-    model.add(Conv2D(filters=112, kernel_size=4, strides=1, activation='relu'))
-    model.add(Conv2D(filters=80, kernel_size=3, strides=1, activation='relu'))
-    model.add(Flatten())
-    model.add(Dense(4096, activation='relu'))
-    model.add(Dense(64 ** 2, activation='sigmoid'))
-    model.add(Reshape((64, 64)))
-    # model.add(UpSampling2D(size=2))
-    # model.add(Reshape((128, 128)))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', precision, recall,
-                                                                         fmeasure, jaccard_coef])
     return model
 
 

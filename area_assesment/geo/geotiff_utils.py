@@ -2,6 +2,8 @@ import numpy as np
 import gdal
 import logging
 
+from shapely.geometry import Polygon
+
 
 def write_geotiff(path: str, raster_layers: np.array, gdal_ds: str):
     logging.debug('WRITING GEOTIFF')
@@ -28,3 +30,20 @@ def write_geotiff(path: str, raster_layers: np.array, gdal_ds: str):
 
     out_raster.FlushCache()
     logging.info('GEOTIFF SAVED: {}'.format(path))
+
+
+def image_coords_to_geo(image_polygons, geo_transform, raster_x_size ):
+    ret = []
+
+    top_left_x = geo_transform[0]
+    top_left_y = geo_transform[3]
+    x_resolution = geo_transform[1]
+    y_resolution = geo_transform[5]
+
+    for p in image_polygons:
+        x = [(top_left_x + x_resolution * x) for x in p.exterior.coords.xy[0]]
+        # yes gdal_ds.RasterXSize for vertical axis, don't know why yet
+        y = [(top_left_y - y_resolution * (y - raster_x_size)) for y in p.exterior.coords.xy[1]]
+        ret.append(Polygon(list(zip(x, y))))
+
+    return ret

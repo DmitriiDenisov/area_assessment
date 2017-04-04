@@ -36,9 +36,9 @@ output_folder = os.path.normpath('../sakaka_data/buildings/output/')
 
 
 # MODEL circle farms
-# model = unet(64, 64, 3)  # cnn_circle_farms((512, 512, 3))
+# model = unet(64, 64, 3)  # cnn_circlefarms((512, 512, 3))
 # # model.summary()
-# net_weights_load = '../weights/cnn_circle_farms/unet64x64_buildings_weights_epoch270_jaccard0.0876_valjaccard0.0930.'
+# net_weights_load = '../weights/cnn_circlefarms/unet64x64_buildings_weights_epoch270_jaccard0.0876_valjaccard0.0930.'
 # logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 # model.load_weights(net_weights_load)
 #
