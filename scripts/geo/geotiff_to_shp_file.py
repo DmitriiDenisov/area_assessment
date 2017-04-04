@@ -10,6 +10,7 @@ from gdalconst import GA_ReadOnly
 from shapely.geometry import Polygon, MultiPolygon
 
 from area_assesment.images_processing.polygons import mask_to_polygons
+from area_assesment.geo import geotiff_utils
 
 parser = argparse.ArgumentParser(description='Creates ESRI shapefile from GeoTIFFs images with mask.')
 parser.add_argument('src_dir', metavar='src_dir', type=str,
@@ -43,6 +44,7 @@ src_dir = os.path.abspath(os.path.normpath(args.src_dir))
 dst_dir = os.path.abspath(os.path.normpath(args.dst_dir))
 
 polygons_list = []
+polygons_list_rect = []
 
 projection_wkt = None
 
@@ -54,31 +56,30 @@ for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.p
     mask[mask < floor(args.m_thre * 255)] = 0
     mask[mask >= floor(args.m_thre * 255)] = 1
 
-    image_polygons = mask_to_polygons(mask, epsilon=1, min_area=0.02, rect_polygon=False)
+    image_polygons = mask_to_polygons(mask, epsilon=1, min_area=0.5, rect_polygon=False)
+    image_polygons_rect = mask_to_polygons(mask, epsilon=1, min_area=0.5, rect_polygon=True)
 
     gdal_ds = gdal.Open(cur_file_path, GA_ReadOnly)
-    top_left_x = gdal_ds.GetGeoTransform()[0]
-    top_left_y = gdal_ds.GetGeoTransform()[3]
-    x_resolution = gdal_ds.GetGeoTransform()[1]
-    y_resolution = gdal_ds.GetGeoTransform()[5]
-
-    for p in image_polygons:
-        x = [(top_left_x + x_resolution * x) for x in p.exterior.coords.xy[0]]
-        # yes gdal_ds.RasterXSize for vertical axis, don't know why yet
-        y = [(top_left_y - y_resolution * (y - gdal_ds.RasterXSize)) for y in p.exterior.coords.xy[1]]
-        p_transformed = Polygon(list(zip(x, y)))
-        polygons_list.append(p_transformed)
+    polygons_list = polygons_list \
+                    + geotiff_utils.image_coords_to_geo(image_polygons, gdal_ds.GetGeoTransform(), gdal_ds.RasterXSize)
+    polygons_list_rect = polygons_list_rect \
+                    + geotiff_utils.image_coords_to_geo(image_polygons_rect, gdal_ds.GetGeoTransform(), gdal_ds.RasterXSize)
 
     # gets projection wkt of the last processed file
     projection_wkt = gdal_ds.GetProjection()
 
 mult_p = MultiPolygon(polygons_list)
+mult_p_r = MultiPolygon(polygons_list_rect)
 
 driver = ogr.GetDriverByName('ESRI Shapefile')
+driver_r = ogr.GetDriverByName('ESRI Shapefile')
 driver_c = ogr.GetDriverByName('ESRI Shapefile')
+driver_gjc = ogr.GetDriverByName('GeoJSON')
 
-ds = driver.CreateDataSource(os.path.join(dst_dir,"{}.shp".format(args.ln)))
-ds_c = driver_c.CreateDataSource(os.path.join(dst_dir,"{}-centroids.shp".format(args.ln)))
+ds = driver.CreateDataSource(os.path.join(dst_dir, "{}.shp".format(args.ln)))
+ds_r = driver_r.CreateDataSource(os.path.join(dst_dir, "{}-rect.shp".format(args.ln)))
+ds_c = driver_c.CreateDataSource(os.path.join(dst_dir, "{}-centroids.shp".format(args.ln)))
+ds_gjc = driver_gjc.CreateDataSource(os.path.join(dst_dir, "{}-centroids.json".format(args.ln)))
 
 source_srs = osr.SpatialReference()
 source_srs.ImportFromWkt(projection_wkt)
@@ -101,9 +102,22 @@ layer.CreateField(ogr.FieldDefn("area", ogr.OFTReal))
 layer.CreateField(ogr.FieldDefn("totalArea", ogr.OFTReal))
 layer.CreateField(ogr.FieldDefn("totalCount", ogr.OFTInteger))
 
-layer_c = ds_c.CreateLayer(args.ln+"_centroids", srs, ogr.wkbPoint)
+layer_r = ds_r.CreateLayer(args.ln + "_rect", srs, ogr.wkbMultiPolygon)
+layer_r.CreateField(ogr.FieldDefn("name", ogr.OFTString))
+layer_r.CreateField(ogr.FieldDefn("key", ogr.OFTString))
+layer_r.CreateField(ogr.FieldDefn("area", ogr.OFTReal))
+layer_r.CreateField(ogr.FieldDefn("totalArea", ogr.OFTReal))
+layer_r.CreateField(ogr.FieldDefn("totalCount", ogr.OFTInteger))
+
+layer_c = ds_c.CreateLayer(args.ln + "_centroids", srs, ogr.wkbPoint)
 layer_c.CreateField(ogr.FieldDefn("name", ogr.OFTString))
 layer_c.CreateField(ogr.FieldDefn("area", ogr.OFTReal))
+
+layer_gjc = ds_gjc.CreateLayer(args.ln + "_centroids", source_srs, ogr.wkbPoint)
+layer_gjc.CreateField(ogr.FieldDefn("name", ogr.OFTString))
+layer_gjc.CreateField(ogr.FieldDefn("area", ogr.OFTReal))
+layer_gjc.CreateField(ogr.FieldDefn("Primary ID", ogr.OFTReal))
+layer_gjc.CreateField(ogr.FieldDefn("Secondary ID", ogr.OFTString))
 
 total_area = 0.0
 
@@ -121,6 +135,7 @@ for i, p in enumerate(mult_p):
     feature.SetField("name", "{}_{}".format(args.fn, i))
     feature.SetField("key", "{}_{}".format(args.fn, i))
     feature.SetField("totalCount", len(mult_p))
+
     # add the feature in the layer
     layer.CreateFeature(feature)
     # Dereference the feature
@@ -131,10 +146,34 @@ for i, p in enumerate(mult_p):
     feature_c.SetGeometry(centroid)
     feature_c.SetField("area", geom_poly.GetArea())
     feature_c.SetField("name", "{}_{}".format(args.fn, i))
-
     layer_c.CreateFeature(feature_c)
 
+    feature_gjc = ogr.Feature(layer_gjc.GetLayerDefn())
+    feature_gjc.SetGeometry(ogr.CreateGeometryFromWkb(p.wkb).Centroid())
+    feature_gjc.SetField("name", "{}_{}".format(args.fn, i))
+    feature_gjc.SetField("Secondary ID", "{}_{}".format(args.fn, i))
+    feature_gjc.SetField("Primary ID", geom_poly.GetArea())
+    feature_gjc.SetField("area", geom_poly.GetArea())
+    layer_gjc.CreateFeature(feature_gjc)
+
+    feature_gjc = None
     feature_c = None
+    feature = None
+
+for i, p in enumerate(mult_p_r):
+    # create bew feature
+    feature = ogr.Feature(layer_r.GetLayerDefn())
+    # create geometry from polygon
+    geom_poly = ogr.CreateGeometryFromWkb(p.wkb)
+    # transform geometry from source_srs to target_srs
+    geom_poly.Transform(transform)
+    # set the feature geometry and attributes
+    feature.SetGeometry(geom_poly)
+    feature.SetField("area", geom_poly.GetArea())
+    feature.SetField("name", "{}_{}".format(args.fn, i))
+    feature.SetField("key", "{}_{}".format(args.fn, i))
+    feature.SetField("totalCount", len(mult_p))
+    layer_r.CreateFeature(feature)
     feature = None
 
 # terrible workaround to store total area and count of features of mapbox
@@ -142,8 +181,17 @@ for i in range(layer.GetFeatureCount()):
     feature = layer.GetFeature(i)
     feature.SetField("totalArea", total_area)
     layer.SetFeature(feature)
+    feature = None
+
+for i in range(layer_r.GetFeatureCount()):
+    feature = layer_r.GetFeature(i)
+    feature.SetField("totalArea", total_area)
+    layer_r.SetFeature(feature)
+    feature = None
 
 
 # Save and close everything
-ds = layer = feat = geom = None
+ds = layer = geom = None
+ds_r = layer_r = None
 ds_c = layer_c = None
+ds_gjc = layer_gjc = None
