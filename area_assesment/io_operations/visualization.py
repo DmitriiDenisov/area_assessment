@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import logging
 
 
-def plot_img(img, name=None, show_plot=False, save_output_path=None):
+def plot1(img, name=None, show_plot=False, save_output_path=None):
     fig = plt.figure(frameon=False, figsize=(10, 10))
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
@@ -19,7 +19,7 @@ def plot_img(img, name=None, show_plot=False, save_output_path=None):
         plt.savefig(filename, dpi=700)
 
 
-def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_output_path=None, dpi=700):
+def plot2(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_output_path=None, dpi=700):
     if overlay:
         fig = plt.figure(frameon=False, figsize=(10, 10))
         ax = plt.Axes(fig, [0., 0., 1., 1.])
@@ -29,9 +29,9 @@ def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False
         ax.imshow(mask, alpha=alpha, cmap='viridis')
     else:
         fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(10, 10))
-        ax[0].imshow(img), ax[0].set_title('image'), ax[0].axis('off')
-        ax[1].imshow(mask), ax[1].set_title('mask'), ax[1].axis('off')
-        plt.tight_layout()
+        ax[0].imshow(img), ax[0].set_title('1'), ax[0].axis('off')
+        ax[1].imshow(mask), ax[1].set_title('2'), ax[1].axis('off')
+        fig.tight_layout()
         if name:
             plt.suptitle(name)
     if show_plot:
@@ -42,7 +42,7 @@ def plot_img_mask(img, mask, name=None, overlay=False, alpha=.7, show_plot=False
         plt.savefig(filename, dpi=dpi)
 
 
-def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=False, save_output_path=None):
+def plot3(img, mask_true, mask_pred, name=None, show_plot=False, save_output_path=None):
     """
     Plotting raw image, mask true, mask_pred. Support saving into given directory with given filename.
 
@@ -56,9 +56,9 @@ def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=False, sa
     """
 
     fig, ax = plt.subplots(ncols=3, nrows=1, figsize=(20, 10))
-    ax[0].imshow(img), ax[0].set_title('image'), ax[0].axis('off')
-    ax[1].imshow(mask_true), ax[1].set_title('mask_true'), ax[1].axis('off')
-    ax[2].imshow(mask_pred), ax[2].set_title('mask_pred'), ax[2].axis('off')
+    ax[0].imshow(img), ax[0].set_title('1'), ax[0].axis('off')
+    ax[1].imshow(mask_true), ax[1].set_title('2'), ax[1].axis('off')
+    ax[2].imshow(mask_pred), ax[2].set_title('3'), ax[2].axis('off')
     plt.tight_layout()
     if name:
         plt.suptitle(name)
@@ -68,3 +68,24 @@ def plot_img_mask_pred(img, mask_true, mask_pred, name=None, show_plot=False, sa
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
         plt.savefig(filename, dpi=500)
+
+
+def plot_imgs(imgs, show_plot=True):
+    """
+    Plotting raw image, mask true, mask_pred. Support saving into given directory with given filename.
+
+    :param img: numpy array of shape (x, y, ...)
+    :param mask_true: numpy array of shape (x, y, ...)
+    :param mask_pred: numpy array of shape (x, y, ...)
+    :param name:
+    :param show_plot:
+    :param save_output_path:
+    :return:
+    """
+
+    fig, ax = plt.subplots(ncols=imgs.shape[0], nrows=imgs.shape[1], figsize=(20, 10))
+    for i in range(imgs.shape[0]):
+        ax[i].imshow(imgs[i]), ax[i].set_title(i+1), ax[i].axis('off')
+    plt.tight_layout()
+    if show_plot:
+        plt.show()

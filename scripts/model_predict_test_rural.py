@@ -7,7 +7,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from area_assesment.images_processing.patching import array2patches, patches2array_overlap, patches2array
 from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.io_operations.visualization import plot_img_mask_pred, plot_img_mask, plot_img
+from area_assesment.io_operations.visualization import plot3, plot2, plot1
 from area_assesment.neural_networks.cnn import *
 from area_assesment.geo.utils import write_geotiff
 from area_assesment.images_processing.normalization import equalizeHist_rgb
@@ -85,7 +85,7 @@ for i, f_sat in enumerate(valid_sat_files):
     logging.debug('map_patches_pred.shape: {}'.format(map_patches_pred.shape))
 
     # for i in range(sat_patches.shape[0]):
-    #     plot_img_mask(sat_patches[i], map_patches_pred[i], show_plot=True)
+    #     plot2(sat_patches[i], map_patches_pred[i], show_plot=True)
 
     # map_pred = patches2array(map_patches_pred, img_size=img_sat.shape[:2], step_size=step_size,
     #                          nn_input_patch_size=nn_input_patch_size, nn_output_patch_size=nn_output_patch_size)
@@ -108,13 +108,13 @@ for i, f_sat in enumerate(valid_sat_files):
     map_pred[map_pred > 1] = 1
 
     # PLOT OVERLAY IMG, MASK_PRED
-    plot_img_mask(img_sat_, map_pred, name='/{}_OVERLAY_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size),
-                  overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
+    plot2(img_sat_, map_pred, name='/{}_OVERLAY_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size),
+          overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
 
-    plot_img(map_pred, name='/{}_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
-             show_plot=False, save_output_path=output_folder)
+    plot1(map_pred, name='/{}_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
+          show_plot=False, save_output_path=output_folder)
 
-    # plot_img(img_sat_, name='/{}_ORIG_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
+    # plot1(img_sat_, name='/{}_ORIG_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
     #          show_plot=False, save_output_path=output_folder)
 
     # WRITE GEOTIFF

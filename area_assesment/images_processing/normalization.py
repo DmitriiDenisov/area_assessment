@@ -2,7 +2,7 @@ import os
 import numpy as np
 import cv2
 from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.io_operations.visualization import plot_img_mask
+from area_assesment.io_operations.visualization import plot2
 
 
 def equalizeHist_rgb(img):
@@ -23,4 +23,4 @@ if __name__ == '__main__':
 
         img_sat_ = cv2.imread(f_sat)  # [-500:, -1000:]
         img_sat = equalizeHist_rgb(img_sat_)
-        plot_img_mask(img_sat_, img_sat, show_plot=True)
+        plot2(img_sat_, img_sat, show_plot=True)

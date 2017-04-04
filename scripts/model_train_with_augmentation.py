@@ -8,7 +8,7 @@ from sklearn.feature_extraction.image import *
 from sklearn.metrics import jaccard_similarity_score
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.images_processing.patching import array2patches, rotateImage
-from area_assesment.io_operations.visualization import plot_img_mask
+from area_assesment.io_operations.visualization import plot2
 from area_assesment.neural_networks.cnn import *
 import hashlib
 
@@ -59,13 +59,13 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_map = img_map.astype('float32')
     img_sat /= 255
     img_map /= 255
-    # plot_img_mask(img_sat, img_map, show_plot=True)
+    # plot2(img_sat, img_map, show_plot=True)
 
     img_sat_patches = array2patches(img_sat, patch_size=nn_input_patch_size, step_size=step_size)
     img_map_patches = array2patches(img_map, patch_size=nn_input_patch_size, step_size=step_size)
     # for (sat_patch, map_patch) in list(zip(img_sat_patches, img_map_patches)):
     #     logging.debug(sat_patch.shape, map_patch.shape)
-    #     plot_img_mask(sat_patch, map_patch, show_plot=True)
+    #     plot2(sat_patch, map_patch, show_plot=True)
     img_map_patches = img_map_patches[:,
                                       nn_input_patch_size[0]//2 - nn_output_patch_size[0]//2:
                                       nn_input_patch_size[0]//2 + nn_output_patch_size[0]//2,

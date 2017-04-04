@@ -21,7 +21,7 @@ if __name__ == '__main__':
         # sat, map, pred = np.load(sat), np.load(map), np.load(pred)
         pred = np.load(pred)
         print(sat.shape, map.shape, pred.shape)
-        plot_img_mask_pred(sat, map, pred)
+        plot3(sat, map, pred)
 
         mask = np.zeros(sat.shape[:2], np.uint8)
         bgdModel = np.zeros((1, 65), np.float64)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         cv2.grabCut(sat, mask, None, bgdModel, fgdModel, 100, cv2.GC_INIT_WITH_MASK)
         mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
         sat = sat * mask[:, :, np.newaxis]
-        plot_img_mask(sat, map, overlay=True, alpha=0.5)
-        plot_img_mask(sat, pred, overlay=True, alpha=0.5)
+        plot2(sat, map, overlay=True, alpha=0.5)
+        plot2(sat, pred, overlay=True, alpha=0.5)
 
 
