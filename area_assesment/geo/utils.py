@@ -32,7 +32,7 @@ def write_geotiff(path: str, raster_layers: np.array, gdal_ds: str):
     logging.info('GEOTIFF SAVED: {}'.format(path))
 
 
-def image_coords_to_geo(image_polygons, geo_transform, raster_x_size ):
+def image_coords_to_geo(image_polygons, geo_transform, raster_x_size):
     ret = []
 
     top_left_x = geo_transform[0]
@@ -47,3 +47,13 @@ def image_coords_to_geo(image_polygons, geo_transform, raster_x_size ):
         ret.append(Polygon(list(zip(x, y))))
 
     return ret
+
+
+def create_feature_field(layer_list: [], name: str, oft_type):
+    for l in layer_list:
+        l.CreateField(gdal.ogr.FieldDefn(name, oft_type))
+
+
+def set_feature_field(feature_list: [], name: str, value):
+    for f in feature_list:
+        f.SetField(name, value)

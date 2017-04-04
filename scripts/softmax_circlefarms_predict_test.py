@@ -10,7 +10,7 @@ from area_assesment.images_processing.patching import array2patches, patches2arr
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.io_operations.visualization import plot_img_mask_pred, plot_img_mask, plot_img
 from area_assesment.neural_networks.cnn import *
-from area_assesment.geo.geotiff_utils import write_geotiff
+from area_assesment.geo.utils import write_geotiff
 from area_assesment.images_processing.normalization import equalizeHist_rgb
 from area_assesment.neural_networks.unet import unet
 

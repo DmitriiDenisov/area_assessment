@@ -2,7 +2,7 @@ import os
 import gdal
 import cv2
 
-from area_assesment.geo.geotiff_utils import write_geotiff
+from area_assesment.geo.utils import write_geotiff
 
 ## Create and write GeoTIFF
 

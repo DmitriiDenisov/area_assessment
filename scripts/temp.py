@@ -7,7 +7,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from sklearn.feature_extraction.image import *
 from sklearn.metrics import jaccard_similarity_score
 
-from area_assesment.geo.geotiff_utils import write_geotiff
+from area_assesment.geo.utils import write_geotiff
 from area_assesment.images_processing.normalization import equalizeHist_rgb
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.images_processing.patching import array2patches
