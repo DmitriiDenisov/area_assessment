@@ -32,8 +32,8 @@ step_size = 128  # 256  # 16
 
 # MODEL SETTINGS
 epochs = 100
-net_weights_load = None  # os.path.normpath('../weights/cnn_circle_farms/w_epoch97_jaccard0.6741_valjaccard0.4200.hdf5')
-net_weights_dir_save = os.path.normpath('../weights/cnn_circle_farms/')
+net_weights_load = None  # os.path.normpath('../weights/cnn_circlefarms/w_epoch97_jaccard0.6741_valjaccard0.4200.hdf5')
+net_weights_dir_save = os.path.normpath('../weights/cnn_circlefarms/')
 ########################################################
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY

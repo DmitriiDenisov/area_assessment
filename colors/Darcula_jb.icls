@@ -27,6 +27,11 @@
         <option name="FOREGROUND" value="ce89ff" />
       </value>
     </option>
+    <option name="PY.PARAMETER">
+      <value>
+        <option name="FOREGROUND" value="e0e6e8" />
+      </value>
+    </option>
     <option name="PY.STRING.U">
       <value>
         <option name="FOREGROUND" value="ec633d" />

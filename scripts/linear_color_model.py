@@ -26,6 +26,8 @@ mask_ = mask.reshape(-1)
 # MODEL TRAIN&PREDICT
 pipeline = make_pipeline(StandardScaler(), SGDClassifier(loss='log'))
 pipeline.fit(X=img_, y=mask_)
+
+
 mask_pred = pipeline.predict_proba(img_)[:, 1]
 
 mask_pred_thresh = mask_pred >= np.percentile(mask_pred, 96)
