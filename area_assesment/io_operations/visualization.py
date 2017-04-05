@@ -82,10 +82,12 @@ def plot_imgs(imgs, show_plot=True):
     :param save_output_path:
     :return:
     """
-
-    fig, ax = plt.subplots(ncols=imgs.shape[0], nrows=imgs.shape[1], figsize=(20, 10))
+    print(imgs.shape)
+    fig, ax = plt.subplots(nrows=imgs.shape[0], ncols=imgs.shape[1], figsize=(20, 10))
     for i in range(imgs.shape[0]):
-        ax[i].imshow(imgs[i]), ax[i].set_title(i+1), ax[i].axis('off')
+        for j in range(imgs.shape[1]):
+            logging.debug('ij', i, j, imgs.shape[0], imgs.shape[1], imgs[i, j].shape)
+            ax[i, j].imshow(imgs[i, j]) #, ax[i, j].set_title(i+1, j+1), ax[i, j].axis('off')
     plt.tight_layout()
     if show_plot:
         plt.show()

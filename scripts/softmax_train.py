@@ -16,7 +16,7 @@ import hashlib
 
 #########################################################
 # RUN ON SERVER
-# PYTHONPATH=~/area_assesment/ python3 model_train.py
+# PYTHONPATH=~/area_assesment/ python3 images_augmentation.py
 #########################################################
 
 
@@ -25,23 +25,23 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 
 # MODEL DEFINITION
 logging.info('MODEL DEFINITION')
-model = unet(128, 128, 3)  # unet_circle_farms(256, 256, 3) #unet(64, 64, 3)
+model = unet(64, 64, 3)  # unet_circle_farms(256, 256, 3) #unet(64, 64, 3)
 model.summary()
 
 # PATCHING SETTINGS
-nn_input_patch_size = (128, 128)
+nn_input_patch_size = (64, 64)
 nn_output_patch_size = nn_input_patch_size
 # step_size = 16
-patches_per_img = 100
+patches_per_img = 1000
 
 # MODEL SETTINGS
 epochs = 50
-net_weights_load = os.path.normpath('../weights/unet/buildings-unet_128x128_epoch49_iu0.9184_val_iu0.9389.hdf5')
+net_weights_load = os.path.normpath('../weights/unet/buildings-unet_64x64x3_epoch413_iu0.9001_val_iu0.9504.hdf5')
 net_weights_dir_save = os.path.normpath('../weights/unet/')
 ########################################################
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = os.path.normpath('../sakaka_data/buildings/Dawmat_Al_Jandal/')
+dir_train = os.path.normpath('../sakaka_data/buildings/train/')
 dir_train_sat = os.path.join(dir_train, 'sat/')
 dir_train_map = os.path.join(dir_train, 'map/')
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
@@ -65,9 +65,9 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_map_2 = np.ones(img_map.shape) - img_map.copy()
     # plot2(img_map_1, img_map_2, show_plot=True)
 
-    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=3)
-    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=3)
-    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=3)
+    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=7)
+    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=7)
+    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=7)
 
     # for (sat_patch, map_1_patch, map_2_patch) in list(zip(img_sat_patches, img_map_1_patches, img_map_2_patches)):
     #     logging.debug(sat_patch.shape, map_1_patch.shape)
@@ -99,6 +99,6 @@ if net_weights_load:
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 # tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                             'buildings-unet_128x128x3_epoch3{epoch:02d}_iu{jaccard_coef:.4f}_val_iu{val_jaccard_coef:.4f}.hdf5'),
+                             'buildings-unet_64x64x3_epoch5{epoch:02d}_iu{jaccard_coef:.4f}_val_iu{val_jaccard_coef:.4f}.hdf5'),
                              monitor='val_loss', save_best_only=False)
 model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.1)

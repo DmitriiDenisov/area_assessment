@@ -18,34 +18,21 @@ from area_assesment.neural_networks.unet import *
 import hashlib
 
 
-sat_gen = ImageDataGenerator(
-    rotation_range=90.)
+data_gen_args = dict(rotation_range=90.,
+                     rescale=1/255.0,
+                     fill_mode='constant', cval=128)
 
-mask_gen = ImageDataGenerator(
-    rotation_range=90.)
-
+sat_gen = ImageDataGenerator(**data_gen_args)
+mask_gen = ImageDataGenerator(**data_gen_args)
 
 output_folder = os.path.normpath('../sakaka_data/buildings/output/')
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-# dir = os.path.normpath('../sakaka_data/buildings/train2/sat/')
-files_sat = filenames_in_dir(os.path.normpath('../sakaka_data/buildings/train2/sat/'), endswith_='.tif')[:4]
-files_mask = filenames_in_dir(os.path.normpath('../sakaka_data/buildings/train2/map/'), endswith_='.tif')[:4]
-sats = np.array([(cv2.imread(f).astype('float32')/255.0) for f in files_sat])
-masks = np.array([(cv2.imread(f).astype('float32')/255.0) for f in files_mask])
+files_sat = filenames_in_dir(os.path.normpath('../sakaka_data/buildings/train2/sat/'), endswith_='.tif')[:2]
+files_mask = filenames_in_dir(os.path.normpath('../sakaka_data/buildings/train2/map/'), endswith_='.tif')[:2]
+sats = np.array([(cv2.imread(f).astype('float32')) for f in files_sat])
+masks = np.array([(cv2.imread(f).astype('float32')) for f in files_mask])
 print(sats.shape, masks.shape)
-# sats = np.empty((0, sats[0], nn_input_patch_size[1], 3))
-# masks = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1], 2))
-# for i, (f_sat, f_mask) in enumerate(list(zip(files_sat, files_mask))):
-#     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(files_sat), f_sat))
-#     sat_, mask_ = cv2.imread(f_sat), cv2.imread(f_mask, cv2.IMREAD_GRAYSCALE)
-#     plot2(sat_, mask_, show_plot=True)
-#
-#     sat, mask = sat_.astype('float32')/255.0, sat_.astype('float32')/255.0
-#
-#     sats, masks = sat[np.newaxis, :], mask[np.newaxis, :]
-#     print('sats.shape: {}, masks.shape: {}'.format(sats.shape, masks.shape))
-
 
 sat_gen.fit(sats)
 mask_gen.fit(masks)
@@ -59,4 +46,3 @@ for s, m in zip(sat_flow, mask_flow):
     sm = np.array([s, m])
     print('sm.shape', sm.shape)
     plot_imgs(sm)
-    # plot_imgs(m)

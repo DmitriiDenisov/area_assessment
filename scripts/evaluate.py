@@ -3,12 +3,8 @@ import cv2
 import os
 import sys
 sys.path.append('../area_assesment/images_processing')
-from polygons import mask_to_polygons
+# from polygons import mask_to_polygons
 
-
-np.random.seed(111)
-train_nums = np.random.choice(np.arange(112), size=int(0.7 * 112), replace=False)
-valid_nums = np.delete(np.arange(112), train_nums)
 
 folder_heatmap = '../sakaka_data/buildings/output/'
 heats = [f for f in os.listdir(folder_heatmap) if os.path.isfile(os.path.join(folder_heatmap, f))]

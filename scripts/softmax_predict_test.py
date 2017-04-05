@@ -4,7 +4,7 @@ import logging
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from area_assesment.images_processing.patching import array2patches, patches2array_overlap, patches2array
+from area_assesment.images_processing.patching import array2patches, patches2array
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.io_operations.visualization import plot3, plot2, plot1
 from area_assesment.neural_networks.cnn import *
@@ -18,25 +18,24 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 # MODEL builidings
 model = unet(64, 64, 3)
 model.summary()
-net_weights_load = '../weights/unet/unet_adam_64x64_epoch01_jaccard0.9510_valjaccard0.9946.hdf5'
+net_weights_load = '../weights/unet/buildings-unet_64x64x3_epoch407_iu0.8986_val_iu0.9511.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
 # PATCHING SETTINGS buildings
 nn_input_patch_size = (64, 64)
 nn_output_patch_size = (64, 64)
-subpatch_size = (16, 16)
-step_size = 16
+subpatch_size = (32, 32)
+step_size = 32
 
-# dir_test = os.path.normpath('../sakaka_data/Area_Sakaka_Dawmat_Al_Jandal/')  # '../../data/mass_buildings/valid/'
-dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
-output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_64x64_epoch01_subpatch16_stepsize16/')
+dir_test = os.path.normpath('../sakaka_data/buildings/valid/sat/')  # '../../data/mass_buildings/valid/'
+# dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
+output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_64x64_epoch407_subpatch32_stepsize32/')
 ########################################################
-
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_test))
-valid_sat_files = filenames_in_dir(dir_test, endswith_='.tif')[48:]
+valid_sat_files = filenames_in_dir(dir_test, endswith_='.tif')
 for i, f_sat in enumerate(valid_sat_files):
     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(valid_sat_files), f_sat))
     img_sat_ = cv2.imread(f_sat)  # [2000:2256, 0:256]
@@ -108,5 +107,7 @@ for i, f_sat in enumerate(valid_sat_files):
     geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(os.path.basename(f_sat)[:-4]))
     write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
 
-    # np.save('{}_OVERLAY_GRABCUT_stepsize{}.npy'.format(f_sat.split('/')[-1][:-4], step_size), map_pred)
+    # WRITE npy (for test)
+    npy_output_path = os.path.join(output_folder, '{}_HEATMAP.npy'.format(os.path.basename(f_sat)[:-4]))
+    np.save(npy_output_path, map_pred)
 

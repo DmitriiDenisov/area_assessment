@@ -14,7 +14,7 @@ import hashlib
 
 #########################################################
 # RUN ON SERVER
-# PYTHONPATH=~/area_assesment/ python3 model_train.py
+# PYTHONPATH=~/area_assesment/ python3 images_augmentation.py
 #########################################################
 
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,

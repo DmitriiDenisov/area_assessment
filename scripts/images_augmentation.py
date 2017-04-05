@@ -16,7 +16,7 @@ import hashlib
 
 #########################################################
 # RUN ON SERVER
-# PYTHONPATH=~/area_assesment/ python3 model_train.py
+# PYTHONPATH=~/area_assesment/ python3 images_augmentation.py
 #########################################################
 
 
