@@ -10,12 +10,19 @@
   <attributes>
     <option name="CONSOLE_NORMAL_OUTPUT">
       <value>
-        <option name="FOREGROUND" value="322bbb" />
+        <option name="FOREGROUND" value="e0e6e8" />
+      </value>
+    </option>
+    <option name="CONSOLE_SYSTEM_OUTPUT">
+      <value>
+        <option name="FOREGROUND" value="bbbbbb" />
+        <option name="BACKGROUND" value="3c3f41" />
       </value>
     </option>
     <option name="CONSOLE_USER_INPUT">
       <value>
         <option name="FOREGROUND" value="f200" />
+        <option name="BACKGROUND" value="3c3f41" />
       </value>
     </option>
     <option name="PY.BUILTIN_NAME">
