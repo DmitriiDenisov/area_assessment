@@ -18,7 +18,7 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 # MODEL builidings
 model = unet(64, 64, 3)
 model.summary()
-net_weights_load = '../weights/unet/buildings-unet_64x64x3_epoch407_iu0.8986_val_iu0.9511.hdf5'
+net_weights_load = '../weights/unet/buildings-unet_64x64x3_epoch625_iu0.9085_val_iu0.9498.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
@@ -28,9 +28,9 @@ nn_output_patch_size = (64, 64)
 subpatch_size = (32, 32)
 step_size = 32
 
-dir_test = os.path.normpath('../sakaka_data/buildings/valid/sat/')  # '../../data/mass_buildings/valid/'
-# dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
-output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_64x64_epoch407_subpatch32_stepsize32/')
+# dir_test = os.path.normpath('../sakaka_data/buildings/valid/sat/')  # '../../data/mass_buildings/valid/'
+dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
+output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_64x64_epoch625_subpatch32_stepsize32/')
 ########################################################
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY

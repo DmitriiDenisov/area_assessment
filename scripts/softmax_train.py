@@ -32,11 +32,11 @@ model.summary()
 nn_input_patch_size = (64, 64)
 nn_output_patch_size = nn_input_patch_size
 # step_size = 16
-patches_per_img = 1000
+patches_per_img = 3000
 
 # MODEL SETTINGS
-epochs = 50
-net_weights_load = os.path.normpath('../weights/unet/buildings-unet_64x64x3_epoch413_iu0.9001_val_iu0.9504.hdf5')
+epochs = 200
+net_weights_load = os.path.normpath('../weights/unet/buildings-unet_64x64x3_epoch527_iu0.9038_val_iu0.9529.hdf5')
 net_weights_dir_save = os.path.normpath('../weights/unet/')
 ########################################################
 
@@ -65,9 +65,9 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_map_2 = np.ones(img_map.shape) - img_map.copy()
     # plot2(img_map_1, img_map_2, show_plot=True)
 
-    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=7)
-    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=7)
-    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=7)
+    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=11)
+    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=11)
+    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=11)
 
     # for (sat_patch, map_1_patch, map_2_patch) in list(zip(img_sat_patches, img_map_1_patches, img_map_2_patches)):
     #     logging.debug(sat_patch.shape, map_1_patch.shape)
@@ -99,6 +99,6 @@ if net_weights_load:
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 # tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                             'buildings-unet_64x64x3_epoch5{epoch:02d}_iu{jaccard_coef:.4f}_val_iu{val_jaccard_coef:.4f}.hdf5'),
+                             'buildings-unet_64x64x3_epoch6{epoch:02d}_iu{jaccard_coef:.4f}_val_iu{val_jaccard_coef:.4f}.hdf5'),
                              monitor='val_loss', save_best_only=False)
 model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.1)

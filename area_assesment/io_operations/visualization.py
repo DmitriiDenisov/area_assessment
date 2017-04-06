@@ -71,23 +71,18 @@ def plot3(img, mask_true, mask_pred, name=None, show_plot=False, save_output_pat
 
 
 def plot_imgs(imgs, show_plot=True):
-    """
-    Plotting raw image, mask true, mask_pred. Support saving into given directory with given filename.
-
-    :param img: numpy array of shape (x, y, ...)
-    :param mask_true: numpy array of shape (x, y, ...)
-    :param mask_pred: numpy array of shape (x, y, ...)
-    :param name:
-    :param show_plot:
-    :param save_output_path:
-    :return:
-    """
-    print(imgs.shape)
+    logging.debug('imgs.shape: {}'.format(imgs.shape))
     fig, ax = plt.subplots(nrows=imgs.shape[0], ncols=imgs.shape[1], figsize=(20, 10))
-    for i in range(imgs.shape[0]):
-        for j in range(imgs.shape[1]):
-            logging.debug('ij', i, j, imgs.shape[0], imgs.shape[1], imgs[i, j].shape)
-            ax[i, j].imshow(imgs[i, j]) #, ax[i, j].set_title(i+1, j+1), ax[i, j].axis('off')
+    logging.debug(ax.shape)
+    for k, a in enumerate(ax.reshape(-1)):
+        i = k // (imgs.shape[0]+1)
+        j = k % imgs.shape[1]
+        logging.debug('i:{}/{}, j:{}/{}, imgs[i, j].shape:{}'.format(i, imgs.shape[0], j, imgs.shape[1], imgs[i, j].shape))
+        a.imshow(imgs[i, j]), a.set_title('({}, {})'.format(i+1, j+1)) #, ax[i, j].axis('off')
+    # for i in range(imgs.shape[0]):
+    #     for j in range(imgs.shape[1]):
+    #         logging.debug('i:{}/{}, j:{}/{}, imgs[i, j].shape:{}'.format(i, imgs.shape[0], j, imgs.shape[1], imgs[i, j].shape))
+    #         ax[i, j].imshow(imgs[i, j]) #, ax[i, j].set_title(i+1, j+1), ax[i, j].axis('off')
     plt.tight_layout()
     if show_plot:
         plt.show()
