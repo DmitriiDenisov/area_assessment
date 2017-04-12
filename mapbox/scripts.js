@@ -899,6 +899,7 @@
                     'paint': {
                         'circle-color': cluster[1],
                         'circle-radius': 70,
+						'circle-opacity':0.3,
                         'circle-blur': 1 // blur the circles to get a heatmap look
                     },
                     'filter': i === clusters.length - 1 ?
@@ -1071,10 +1072,10 @@
     // ===========================================================================
     var modesModule = (function () {
         var modes = {
-            ruler: {
-                module: rulerModule,
-                title: 'Ruler mode'
-            },
+            // ruler: {
+            //     module: rulerModule,
+            //     title: 'Ruler mode'
+            // },
             selected: {
                 module: selectedAreaModule,
                 title: 'Selection mode'
