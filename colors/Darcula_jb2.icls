@@ -34,6 +34,16 @@
         <option name="FOREGROUND" value="e0e6e8" />
       </value>
     </option>
+    <option name="PY.PREDEFINED_DEFINITION">
+      <value>
+        <option name="FOREGROUND" value="ff00ff" />
+      </value>
+    </option>
+    <option name="PY.SELF_PARAMETER">
+      <value>
+        <option name="FOREGROUND" value="e781dd" />
+      </value>
+    </option>
     <option name="PY.STRING.U">
       <value>
         <option name="FOREGROUND" value="b1b1" />
