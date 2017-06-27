@@ -2,6 +2,7 @@ import cv2
 import os
 import numpy as np
 import logging
+import matplotlib.pyplot as plt
 from keras.callbacks import TensorBoard, ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.feature_extraction.image import *
@@ -16,7 +17,7 @@ import hashlib
 
 #########################################################
 # RUN ON SERVER
-# PYTHONPATH=~/area_assesment/ python3 images_augmentation.py
+# PYTHONPATH=~/area_assesment/ python3 softmax_train.py
 #########################################################
 
 
@@ -32,31 +33,34 @@ model.summary()
 nn_input_patch_size = (64, 64)
 nn_output_patch_size = nn_input_patch_size
 # step_size = 16
-patches_per_img = 3000
+patches_per_img = 2000
 
 # MODEL SETTINGS
-epochs = 200
-net_weights_load = os.path.normpath('../weights/unet/buildings-unet_64x64x3_epoch527_iu0.9038_val_iu0.9529.hdf5')
-net_weights_dir_save = os.path.normpath('../weights/unet/')
+epochs = 100
+net_weights_load = os.path.normpath('../weights/unet_massachusetts_data/buildings-unet_learn_32x32x3_epoch099_iu0.8049_val_iu0.7780.hdf5')
+net_weights_dir_save = os.path.normpath('../weights/unet_massachusetts_data/')
 ########################################################
 
 # COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY
-dir_train = os.path.normpath('../sakaka_data/buildings/train/')
+# dir_train = os.path.normpath('../sakaka_data/buildings/train/')
+dir_train = os.path.normpath('../../massachusetts_data/mass_buildings/train/')
 dir_train_sat = os.path.join(dir_train, 'sat/')
 dir_train_map = os.path.join(dir_train, 'map/')
 logging.info('COLLECT PATCHES FROM ALL IMAGES IN THE TRAIN DIRECTORY: {}, {}'.format(dir_train_sat, dir_train_map))
-train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tif')
+train_sat_files = filenames_in_dir(dir_train_sat, endswith_='.tiff')
 train_map_files = filenames_in_dir(dir_train_map, endswith_='.tif')
 
 sat_patches = np.empty((0, nn_input_patch_size[0], nn_input_patch_size[1], 3))
 map_patches = np.empty((0, nn_output_patch_size[0], nn_output_patch_size[1], 2))
 for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     logging.info('LOADING IMG: {}/{}, {}, {}'.format(i + 1, len(train_map_files), f_sat, f_map))
-    img_sat_, img_map_ = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
+    # img_sat_, img_map_ = cv2.imread(f_sat), cv2.imread(f_map, cv2.IMREAD_GRAYSCALE)
+    img_map_ = plt.imread(f_map)
+    img_sat_ = plt.imread(f_sat)
     logging.debug('img_sat_.shape: {}, img_map_.shape: {}'.format(img_sat_.shape, img_map_.shape))
-    # logging.debug('img_sat.shape: {}, img_map.shape: {}'.format(img_sat.shape, img_map.shape))
     img_sat = img_sat_.astype('float32')
-    ret, img_map = cv2.threshold(img_map_.astype(np.uint8), 127, 255, cv2.THRESH_BINARY)
+    # ret, img_map = cv2.threshold(img_map_.astype(np.uint8), 127, 255, cv2.THRESH_BINARY)
+    img_map = img_map_[:, :, 0]
     img_map = img_map.astype('float32')
 
     img_sat /= 255
@@ -65,9 +69,9 @@ for i, (f_sat, f_map) in enumerate(list(zip(train_sat_files, train_map_files))):
     img_map_2 = np.ones(img_map.shape) - img_map.copy()
     # plot2(img_map_1, img_map_2, show_plot=True)
 
-    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=11)
-    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=11)
-    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=11)
+    img_sat_patches = extract_patches_2d(img_sat, nn_input_patch_size, max_patches=patches_per_img, random_state=1)
+    img_map_1_patches = extract_patches_2d(img_map_1, nn_input_patch_size, max_patches=patches_per_img, random_state=1)
+    img_map_2_patches = extract_patches_2d(img_map_2, nn_input_patch_size, max_patches=patches_per_img, random_state=1)
 
     # for (sat_patch, map_1_patch, map_2_patch) in list(zip(img_sat_patches, img_map_1_patches, img_map_2_patches)):
     #     logging.debug(sat_patch.shape, map_1_patch.shape)
@@ -97,8 +101,10 @@ if net_weights_load:
 
 # FIT MODEL AND SAVE WEIGHTS
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
-# tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
+tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=False, write_images=True)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                             'buildings-unet_64x64x3_epoch6{epoch:02d}_iu{jaccard_coef:.4f}_val_iu{val_jaccard_coef:.4f}.hdf5'),
+                             'buildings-unet_learn_32x32x3_epoch1{epoch:02d}_iu{jaccard_coef:.4f}_val_iu{val_jaccard_coef:.4f}.hdf5'),
                              monitor='val_loss', save_best_only=False)
-model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint], batch_size=128, validation_split=0.1)
+model.fit(sat_patches, map_patches, epochs=epochs, callbacks=[checkpoint, tb_callback], batch_size=512)
+
+

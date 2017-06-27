@@ -44,9 +44,8 @@ def scoring(mask_true, mask_pred, show_plot=False):
 
     return {'f1': f1, 'iu': iu, 'area_error': area_error}
 
-dir_mask_pred = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_64x64_epoch407_subpatch32_stepsize32/')
+dir_mask_pred = os.path.normpath('../sakaka_data/buildings/valid/pred_buildings_unet_64x64_epoch712_subpatch32_stepsize32/')
 dir_mask_true = os.path.normpath('../sakaka_data/buildings/valid/map/')
-
 
 masks_true = filenames_in_dir(dir_mask_true, endswith_='tif')
 masks_pred = filenames_in_dir(dir_mask_pred, endswith_='npy')
@@ -68,7 +67,7 @@ for i, (f_mask_true, f_mask_pred) in enumerate(list(zip(masks_true, masks_pred))
 logging.info('Overall images: {}'.format(len(masks_true)))
 logging.info('F1 overall: {}'.format(round(sum(f1.values())/len(f1), 3)))
 logging.info('IoU (Jaccard) overall: {}'.format(round(sum(iu.values())/len(iu), 3)))
-logging.info('Area error overall: {}%'.format(round(sum(area_error.values())/len(area_error), 3)))
+logging.info('Area error overall: {} %'.format(round(sum(area_error.values())/len(area_error), 3)))
 
 
 

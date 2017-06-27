@@ -1072,10 +1072,10 @@
     // ===========================================================================
     var modesModule = (function () {
         var modes = {
-            // ruler: {
-            //     module: rulerModule,
-            //     title: 'Ruler mode'
-            // },
+            ruler: {
+                module: rulerModule,
+                title: 'Ruler mode'
+            },
             selected: {
                 module: selectedAreaModule,
                 title: 'Selection mode'

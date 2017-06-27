@@ -18,24 +18,27 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
 # MODEL builidings
 model = unet(64, 64, 3)
 model.summary()
-net_weights_load = '../weights/unet/buildings-unet_64x64x3_epoch625_iu0.9085_val_iu0.9498.hdf5'
+# net_weights_load = '../weights/unet/buildings-unet_128x128x3_epoch446_iu0.8845_val_iu0.9713.hdf5'
+net_weights_load = '../weights/unet_massachusetts_data/buildings-unet_learn_32x32x3_epoch099_iu0.8049_val_iu0.7780.hdf5'
 logging.info('LOADING MODEL WEIGHTS: {}'.format(net_weights_load))
 model.load_weights(net_weights_load)
 
 # PATCHING SETTINGS buildings
 nn_input_patch_size = (64, 64)
-nn_output_patch_size = (64, 64)
-subpatch_size = (32, 32)
-step_size = 32
+nn_output_patch_size = nn_input_patch_size
+subpatch_size = (64, 64)
+step_size = 64
 
 # dir_test = os.path.normpath('../sakaka_data/buildings/valid/sat/')  # '../../data/mass_buildings/valid/'
-dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
-output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_64x64_epoch625_subpatch32_stepsize32/')
+dir_test = os.path.normpath('../../massachusetts_data/mass_buildings/valid/sat')  # '../../data/mass_buildings/valid/'
+# dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
+# output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_128x128_epoch446_subpatch64_stepsize64/')
+output_folder = os.path.normpath('../../massachusetts_data/mass_buildings/valid/net_output/')
 ########################################################
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
 logging.info('TEST ON ALL IMAGES IN THE TEST DIRECTORY: {}'.format(dir_test))
-valid_sat_files = filenames_in_dir(dir_test, endswith_='.tif')
+valid_sat_files = filenames_in_dir(dir_test, endswith_='.tiff')
 for i, f_sat in enumerate(valid_sat_files):
     logging.info('LOADING IMG: {}/{}, {}'.format(i + 1, len(valid_sat_files), f_sat))
     img_sat_ = cv2.imread(f_sat)  # [2000:2256, 0:256]
@@ -94,8 +97,9 @@ for i, f_sat in enumerate(valid_sat_files):
     # plt.show()
 
     # PLOT OVERLAY IMG, MASK_PRED
-    # plot2(img_sat_, map_pred, name='{}_OVERLAY_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size),
-    #               overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
+    plot2(img_sat_, map_pred, name='{}_OVERLAY_HEATMAP_stepsize{}_subpatchsize{}'.format(os.path.basename(f_sat)[:-5],
+                                                                                          step_size, subpatch_size[0]),
+                  overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
 
     # plot1(map_pred, name='{}_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
     #          show_plot=False, save_output_path=output_folder)
@@ -104,10 +108,10 @@ for i, f_sat in enumerate(valid_sat_files):
     #          show_plot=False, save_output_path=output_folder)
 
     # WRITE GEOTIFF
-    geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(os.path.basename(f_sat)[:-4]))
-    write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
+    # geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(os.path.basename(f_sat)[:-5]))
+    # write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
 
     # WRITE npy (for test)
-    npy_output_path = os.path.join(output_folder, '{}_HEATMAP.npy'.format(os.path.basename(f_sat)[:-4]))
-    np.save(npy_output_path, map_pred)
+    # npy_output_path = os.path.join(output_folder, '{}_HEATMAP.npy'.format(os.path.basename(f_sat)[:-4]))
+    # np.save(npy_output_path, map_pred)
 

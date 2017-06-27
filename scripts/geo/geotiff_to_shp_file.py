@@ -5,17 +5,24 @@ import sys
 import cv2
 import gdal
 from math import floor
+
+import logging
 from gdal import ogr, osr
 from gdalconst import GA_ReadOnly
 from shapely.geometry import Polygon, MultiPolygon
 
+# sys.path.append('../../')
+# sys.path.append('../../area_assesment/images_processing/')
 from area_assesment.images_processing.polygons import mask_to_polygons
 from area_assesment.geo import utils
 
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
+                    handlers=[logging.StreamHandler()])
+
 parser = argparse.ArgumentParser(description='Creates ESRI shapefile from GeoTIFFs images with mask.')
-parser.add_argument('src_dir', metavar='src_dir', type=str,
+parser.add_argument('--src_dir', dest='src_dir', type=str, default='../../sakaka_data/buildings/output/buildings_unet_64x64_epoch712_subpatch32_stepsize32/',
                     help='source file or files mask')
-parser.add_argument('dst_dir', metavar='dst_dir', type=str,
+parser.add_argument('--dst_dir', dest='dst_dir', type=str, default='../../sakaka_data/buildings/output/buildings_unet_64x64_epoch712_subpatch32_stepsize32/shp/',
                     help='destination shape file path')
 parser.add_argument('-v', '--verbose', dest='v', action='store_const',
                     const=True, default=False,
@@ -27,10 +34,12 @@ parser.add_argument('-f', '--feature_name', dest='fn', type=str,
                     default='feature',
                     help='feature name')
 parser.add_argument('--target_EPSG', dest='t_epsg', type=int,
+                    default=3857,
                     help='EPSG code to reproject geometry')
 parser.add_argument('--mask_threshold', dest='m_thre', type=float,
-                    default=0.5,
+                    default=0.3,
                     help='threshold to for separation of polygons from background')
+parser.add_argument('--min_area', dest='min_area', type=float, default=1, help='minimum area for polygons to show')
 
 try:
     args = parser.parse_args()
@@ -48,16 +57,17 @@ polygons_list_rect = []
 
 projection_wkt = None
 
-for f in [os.path.basename(f) for f in glob.glob(src_dir) if os.path.isfile(os.path.join(src_dir, f))]:
-    cur_file_path = os.path.join(os.path.dirname(src_dir), f)
+for f in [f for f in os.listdir(src_dir) if os.path.isfile(os.path.join(src_dir, f)) and f[-4:] == '.tif']:
+    cur_file_path = os.path.join(src_dir, f)
+    logging.info(cur_file_path)
     mask = cv2.imread(cur_file_path, cv2.IMREAD_GRAYSCALE)
     if mask is None:
         continue
     mask[mask < floor(args.m_thre * 255)] = 0
     mask[mask >= floor(args.m_thre * 255)] = 1
 
-    image_polygons = mask_to_polygons(mask, epsilon=1, min_area=0.5, rect_polygon=False)
-    image_polygons_rect = mask_to_polygons(mask, epsilon=1, min_area=0.5, rect_polygon=True)
+    image_polygons = mask_to_polygons(mask, epsilon=1, min_area=args.min_area, rect_polygon=False)
+    image_polygons_rect = mask_to_polygons(mask, epsilon=1, min_area=args.min_area, rect_polygon=True)
 
     gdal_ds = gdal.Open(cur_file_path, GA_ReadOnly)
     polygons_list = polygons_list \

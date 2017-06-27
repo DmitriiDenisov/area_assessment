@@ -37,7 +37,8 @@ def plot2(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_o
     if show_plot:
         plt.show()
     if save_output_path:
-        filename = save_output_path + '/' + name + '.png'
+        # filename = save_output_path + '/' + name + '.png'
+        filename = os.path.join(save_output_path, name + '.png')
         logging.info('PLOT: {}'.format(filename))
         plt.savefig(filename, dpi=dpi)
 
