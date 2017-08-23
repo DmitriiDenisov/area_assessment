@@ -1,11 +1,4 @@
 <scheme name="WarmNeon_jb1" version="142" parent_scheme="Default">
-  <metaInfo>
-    <property name="created">2017-08-17T09:08:21</property>
-    <property name="ide">Python</property>
-    <property name="ideVersion">2016.2.1.0.0</property>
-    <property name="modified">2017-08-17T09:53:59</property>
-    <property name="originalScheme">WarmNeon</property>
-  </metaInfo>
   <option name="LINE_SPACING" value="1.1" />
   <option name="EDITOR_FONT_SIZE" value="16" />
   <option name="CONSOLE_FONT_NAME" value="Monospaced" />
