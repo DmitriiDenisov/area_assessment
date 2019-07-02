@@ -20,12 +20,12 @@ def unet(patch_height, patch_width, n_ch):
     conv3 = Dropout(0.2)(conv3)
     conv3 = Convolution2D(128, 3, 3, activation='relu', border_mode='same')(conv3)
 
-    up1 = merge([UpSampling2D(size=(2, 2))(conv3), conv2], mode='concat', concat_axis=3)
+    up1 = Concatenate(axis=3)([UpSampling2D(size=(2, 2))(conv3), conv2])
     conv4 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(up1)
     conv4 = Dropout(0.2)(conv4)
     conv4 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(conv4)
 
-    up2 = merge([UpSampling2D(size=(2, 2))(conv4), conv1], mode='concat', concat_axis=3)
+    up2 = Concatenate(axis=3)([UpSampling2D(size=(2, 2))(conv4), conv1])
     conv5 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(up2)
     conv5 = Dropout(0.2)(conv5)
     conv5 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(conv5)
@@ -36,7 +36,9 @@ def unet(patch_height, patch_width, n_ch):
     conv7 = core.Activation('softmax')(conv6)
     conv7 = core.Reshape((patch_height, patch_width, 2))(conv7)
 
-    model = Model(input=inputs, output=conv7)
+    conv8 = Lambda(lambda x: x[:, :, :, 0])(conv7)
+
+    model = Model(input=inputs, output=conv8)
     # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
     model.compile(optimizer='sgd', loss='binary_crossentropy', metrics=['binary_accuracy', precision,
                                                                         recall, fmeasure, jaccard_coef])
