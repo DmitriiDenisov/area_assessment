@@ -1,0 +1,5 @@
+- очищена папка area_assesment\scripts\logs, там были только логи
+- очищена папка area_assesment\scripts\weights, там были веса - несколько файлов с расширением *.h5
+- из папки area_assesment\scripts удалено pred0, color_test_heatmap0, color_test_heatmap1, color_test_heatmap2
+- очищена папка area_assesment\sakaka_data\building и area_assesment\sakaka_data\building\output, было несколько файлов расширения *.tif
+- из папки area_assesment\weights\unet удален w_epoch20_jaccard0.1035_valjaccard0.3465.hdf5
