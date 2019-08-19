@@ -89,6 +89,11 @@ body {
     border-right: 1px solid #aaa;
 }
 
+.map__moves .control-btn {
+    border-radius: 0;
+    border-right: 1px solid #aaa;
+}
+
 .map__styles {
     display: flex;
     align-items: center;
@@ -146,6 +151,8 @@ body {
 
 .layer__title {
     margin-bottom: 5px;
+    margin-block-start: 0;
+    margin-left: 25px;
 }
 
 .layer__stats {
@@ -170,7 +177,6 @@ body {
 .layer__controls {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
 }
 
 .layer__control {
@@ -443,4 +449,12 @@ body {
     box-shadow: 0 0 0 1px rgba(0, 0, 0, .15) inset, 
                 0 0 6px rgba(0, 0, 0, .2) inset;
     background-color: #dfdfdf;
+}
+
+.color-icon {
+    display: inline;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    position: absolute;
 }

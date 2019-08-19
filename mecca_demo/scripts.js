@@ -74,7 +74,8 @@
 
     // mapboxgl.accessToken = 'pk.eyJ1Ijoib21hbmd1dG92IiwiYSI6ImNpenpvNWtmajAwMjgzMnBmYXp6enhuOTIifQ.KwVxe-y3-a_BeY-uHqBoag';
     // new pk.eyJ1IjoidHVybmlrayIsImEiOiJjanlmcmJpazYwMDc1M2dsZ21tbWhqNnU5In0._LsflxOVYYFfx4CRZ35Wfw
-    mapboxgl.accessToken = 'pk.eyJ1IjoidHVybmlrayIsImEiOiJjanlmcmJpazYwMDc1M2dsZ21tbWhqNnU5In0._LsflxOVYYFfx4CRZ35Wfw';
+    // nick // 'pk.eyJ1IjoidHVybmlrayIsImEiOiJjanlmcmJpazYwMDc1M2dsZ21tbWhqNnU5In0._LsflxOVYYFfx4CRZ35Wfw';
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZG1pdHJpaWRlbmlzb3YiLCJhIjoiY2p5eGMwam15MTV1MjNucGhyNTdicnNyMSJ9.MTiFOwhPS4ms_cYTwzmRTg';
 
     var mapRoot = document.getElementById('map-root');
     var mapWrapper = mapRoot.querySelector('.map__wrapper');
@@ -83,8 +84,8 @@
     var mapSettings = {
         cursor: '',
         style: {
-            baseURI: 'mapbox://styles/turnikk/',
-            defaultStyle: 'cjyfshbbl1hi01crs5gu9z6pw'
+            baseURI: 'mapbox://styles/dmitriidenisov/', // mapbox://styles/turnikk/
+            defaultStyle: 'cjzgymzpz0oqv1coi6qd5vkk5' //'cjzbkqgjy0a571cqcyaxoaxbn' // cjyfshbbl1hi01crs5gu9z6pw
         }
     };
 
@@ -98,33 +99,41 @@
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     var layers = {
-        'buildings_by_mb': {
-            id: 'buildings_by_mb',
-            name: 'Buildings',
+        'mecca-mapbox-newmodel-rect-7jr76k': {
+            id: 'mecca-mapbox-newmodel-rect-7jr76k',
+            name: 'Mecca Mapbox New Model Rectangle',
             visible: true,
-            heatmap: {
-                source: 'https://cisdai.ru/buildings-centroids.geojson',
-                visible: false
-            }
+            color: '#2f0aff'
         },
-        'left-buildings': {
-            id: 'left-buildings',
-            name: 'Left-Buildings 1',
+        'mecca-mapbox-newmodel-default-29tzxv': {
+            id: 'mecca-mapbox-newmodel-default-29tzxv',
+            name: 'Mecca Mapbox New Model Default',
             visible: true,
-            // heatmap: {
-            //     source: 'https://cisdai.ru/buildings-centroids.geojson',
-            //     visible: false
-            // }
+            color: '#8aff14'
         },
-        // 'circle-farms': {
-        //     id: 'circle-farms',
+        'mecca_mapbox jaccard model': {
+            id: 'mecca_mapbox jaccard model',
+            visible: true,
+            name: 'Mecca Mapbox Jaccard model',
+            color: '#fd1795'
+        },
+        'mapbox sakaka jaccard model': {
+            id: 'mapbox sakaka jaccard model',
+            visible: true,
+            name: 'Mapbox Sakaka Jaccard Model',
+            color: '#f57e00'
+        }
+        // 'bing_maps jaccard model': {
+        //     id: 'bing_maps jaccard model',
         //     visible: true,
-        //     name: 'Circle farms'
+        //     name: 'Bing_maps Jaccard model',
+        //     color: '#e20808'
         // },
-        // 'other-farms': {
-        //     id: 'other-farms',
+        // 'initial_image_from_server jaccard model': {
+        //     id: 'initial_image_from_server jaccard model',
         //     visible: true,
-        //     name: 'Other farms'
+        //     name: 'Initial image from server Jaccard model',
+        //     color: '#8b0985'
         // }
     };
     var layersIds = Object.keys(layers).map(function (layerId) {
@@ -171,7 +180,7 @@
             var val = feature.properties[prop.name];
 
             if (prop.type === 'number') {
-                val = val.toFixed(2);
+                val = (val != null) ? val.toFixed(2) : 'N/A';
             }
 
             if (prop.append) {
@@ -201,7 +210,7 @@
             popup.setLngLat(map.unproject(point))
                 .setHTML(
                     '<div className="feature">' +
-                        '<h3 class="feature__title">Feature info</h3>' +
+                        '<h3 class="feature__title">Building info</h3>' +
                         '<dl className="feature__list">' + 
                             renderAllProps(feature) +
                         '</dl>' +
@@ -389,9 +398,13 @@
 
                 tmpl +=
                     '<section class="layer" data-id="' + id + '">' +
-                        '<h3 class="layer__title">' + layer.name + '</h3>' +
-                        renderStats(stats) +
-                        renderControls(layer) +
+                    // '<div class="layer-name-color">' +
+                    '<span class="color-icon" style="background: ' +
+                    layer.color +
+                    '"></span>' +
+                    '<h3 class="layer__title">' + layer.name + '</h3>' +
+                    // '</div>'+
+                    renderControls(layer) +
                     '</section>'
             });
 
@@ -415,6 +428,7 @@
 
             opacityProperties.forEach(function (property) {
                 var layerOpacity = map.getPaintProperty(layerId, property);
+                console.log(layerId, layerOpacity);
                 if (!layerOpacity && layerOpacity !== 0) {
                     opacityFilter.disabled = true;
                     return;
@@ -493,7 +507,69 @@
         };
     })();
 
+    // ===========================================================================
+    // ===========================================================================
+    // MOVES MODULE
+    // ===========================================================================
+    // ===========================================================================
+    var movesModule = (function () {
+        var movesInputName = 'map-moves';
+        var movesWrapper = document.getElementById(movesInputName);
+        var moves = {
+            Mecca: {
+                lng: 39.826694,
+                lat: 21.422751
+            },
+            Dawmat: {
+                lng: 39.8726,
+                lat: 29.80138
+            }
+        }
+        
+        function render() {
+            var movesTmpl ='';
 
+            for (var city in moves) {
+                if (!moves.hasOwnProperty(city)) {
+                    continue;
+                }
+                var coords = moves[city];
+
+                movesTmpl +=
+                    '<button class="mapboxgl-ctrl-icon move-button" ' +
+                    'type="button" ' +
+                    'id="' +
+                    city +
+                    '">' +
+                     city +
+                    '</button>';
+            }
+            movesWrapper.insertAdjacentHTML('beforeend',movesTmpl);
+        }
+
+        function init() {
+            render();
+        }
+
+        function moveMap(coords) {
+            map.setCenter(coords);
+        }
+
+        document.addEventListener('click', function (e) {
+            var target = e.target;
+            var moveBtnPressed = target.closest('.move-button');
+
+            if (!moveBtnPressed) {
+                return;
+            }
+            moveMap(moves[moveBtnPressed['id']]);
+        });
+        return {
+            init: init,
+            move: moveMap,
+            moves: moves,
+        };
+    })();
     // ===========================================================================
     // ===========================================================================
     // STYLES MODULE
@@ -711,6 +787,7 @@
         });
 
         stylesModule.init();
+        movesModule.init();
         modesModule.init();
 
         // ======================== EVENT HANDLERS =================================
