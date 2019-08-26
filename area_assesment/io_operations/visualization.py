@@ -1,10 +1,16 @@
 import os
 import matplotlib
 matplotlib.use('agg')
+import numpy as np
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import logging
+from PIL import Image
 
+
+def just_show_numpy_as_image(numpy_array):
+    img = Image.fromarray(numpy_array.astype(np.uint8), 'RGB')
+    img.show()
 
 def plot1(img, name=None, show_plot=False, save_output_path=None):
     fig = plt.figure(frameon=False, figsize=(10, 10))
@@ -14,7 +20,7 @@ def plot1(img, name=None, show_plot=False, save_output_path=None):
     ax.imshow(img, cmap='viridis')
     if show_plot:
         plt.show()
-    if save_output_path:
+    if save_output_path or save_output_path == '':
         filename = save_output_path + name + '.png'
         logging.info('PLOT: {}'.format(filename))
         plt.savefig(filename, dpi=700)
@@ -37,7 +43,7 @@ def plot2(img, mask, name=None, overlay=False, alpha=.7, show_plot=False, save_o
             plt.suptitle(name)
     if show_plot:
         plt.show()
-    if save_output_path:
+    if save_output_path or save_output_path == '':
         # filename = save_output_path + '/' + name + '.png'
         filename = os.path.join(save_output_path, name + '.png')
         logging.info('PLOT: {}'.format(filename))
@@ -72,7 +78,7 @@ def plot3(img, mask_true, mask_pred, name=None, show_plot=False, save_output_pat
         plt.savefig(filename, dpi=500)
 
 
-def plot_imgs(imgs, show_plot=True):
+def plot_imgs(imgs, name, show_plot=True, save_output_path=''):
     logging.debug('imgs.shape: {}'.format(imgs.shape))
     fig, ax = plt.subplots(nrows=imgs.shape[0], ncols=imgs.shape[1], figsize=(20, 10))
     logging.debug(ax.shape)
@@ -86,5 +92,11 @@ def plot_imgs(imgs, show_plot=True):
     #         logging.debug('i:{}/{}, j:{}/{}, imgs[i, j].shape:{}'.format(i, imgs.shape[0], j, imgs.shape[1], imgs[i, j].shape))
     #         ax[i, j].imshow(imgs[i, j]) #, ax[i, j].set_title(i+1, j+1), ax[i, j].axis('off')
     plt.tight_layout()
+
+    if save_output_path or save_output_path == '':
+        filename = save_output_path + name + '.png'
+        logging.info('PLOT: {}'.format(filename))
+        plt.savefig(filename, dpi=500)
+
     if show_plot:
         plt.show()

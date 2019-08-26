@@ -33,8 +33,3 @@ for i in range(len(files)):
     print('Plotting image #{i} out of {n}'.format(i=i + 1, n=len(files)))
     plot_polygons(polygon_list[i], 'polygons_' + files[i], output_folder=folder_out)
     save_polygons(polygon_list[i], output_folder=folder_out, fname=files[i])
-
-
-
-
-
