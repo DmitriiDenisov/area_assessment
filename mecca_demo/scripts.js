@@ -580,36 +580,44 @@
         var INPUT_NAME = 'map-styles';
         var styles = {
             satellite: {
-                url: 'cj0tpd64o00j82rnphr76axim',
+                url: 'cjzgymzpz0oqv1coi6qd5vkk5',
                 name: 'Satellite'
             },
+            streets: {
+                url: 'cjyxc15dn2eyi1ck9lj3k6r0r',
+                name: 'Streets'
+            },
+            dark: {
+                url: 'cjzsdyzv507fh1clhykwdovyb',
+                name: 'Dark'
+            }
         };
 
-        // function render() {
-        //     var tmpl = '';
-        //
-        //     for (var prop in styles) {
-        //         if (!styles.hasOwnProperty(prop)) {
-        //             continue;
-        //         }
-        //
-        //         var style = styles[prop];
-        //
-        //         tmpl +=
-        //             '<label class="radio-btn">' +
-        //                 '<input ' +
-        //                     'name="' + INPUT_NAME + '" ' +
-        //                     'type="radio" ' +
-        //                     'class="radio-btn__input" ' +
-        //                     'value="' + prop + '" ' +
-        //                     (style.url === mapSettings.style.defaultStyle ? 'checked' : '') +
-        //                 '>' +
-        //                 '<span class="radio-btn__text">' + style.name + '</span>' +
-        //             '</label> ';
-        //     }
-        //
-        //     stylesWrapper.insertAdjacentHTML('beforeend', tmpl);
-        // }
+        function render() {
+            var tmpl = '';
+
+            for (var prop in styles) {
+                if (!styles.hasOwnProperty(prop)) {
+                    continue;
+                }
+
+                var style = styles[prop];
+
+                tmpl +=
+                    '<label class="radio-btn">' +
+                    '<input ' +
+                    'name="' + INPUT_NAME + '" ' +
+                    'type="radio" ' +
+                    'class="radio-btn__input" ' +
+                    'value="' + prop + '" ' +
+                    (style.url === mapSettings.style.defaultStyle ? 'checked' : '') +
+                    '>' +
+                    '<span class="radio-btn__text">' + style.name + '</span>' +
+                    '</label> ';
+            }
+
+            stylesWrapper.insertAdjacentHTML('beforeend', tmpl);
+        }
 
         function syncRadioButtons(checkedVal) {
             var radioButtons = stylesWrapper.querySelectorAll('.radio-btn__input');
@@ -653,7 +661,7 @@
         });
 
         function init() {
-            // render();
+            render();
         }
 
         return {
@@ -664,7 +672,6 @@
     // ===========================================================================
     // end STYLES MODULE
     // ===========================================================================
-
 
     // ===========================================================================
     // ===========================================================================
