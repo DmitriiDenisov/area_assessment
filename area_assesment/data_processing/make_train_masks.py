@@ -10,6 +10,8 @@ from PIL import Image, ImageDraw
 from skimage.draw import polygon
 import numpy as np
 
+# Скрипт читает изображения из папки source_dir. Для каждого изображения создается изображение в папке
+# target_dir с такими же размерами и таким же названием + '_MAP'
 
 def convert_coords_norm(dict_new_polygons, geo_transform):
     # Функция, которая переводит координаты из geo в относительные
@@ -29,12 +31,12 @@ def convert_coords_norm(dict_new_polygons, geo_transform):
     return dict_norm_polygons
 
 
-source_dir = '../../data/train/sat'
+source_dir = '../../data/train/big_sat'
 target_dir = '../../data/train/map'
 P3857 = Proj(init='epsg:3857')
 P4326 = Proj(init='epsg:4326')
 # Прочитать json
-guestFile = open("../../data/train/features (2).geojson", 'r')
+guestFile = open("../../data/train/features.geojson", 'r')
 guestData = guestFile.read()
 guestFile.close()
 gdfJson = json.loads(guestData)
@@ -82,7 +84,7 @@ for f in list_of_files:
             pass
 
     im = Image.fromarray(new_mask * 255)
-    path_ = os.path.join(target_dir, "{}_MAP.tif".format(f))
+    path_ = os.path.join(target_dir, "{}_MAP.tif".format(f[:-4]))
     im.save(path_)
     # plot2(img_sat, new_mask, name='{}_NEW_MASK'.format(f),
     #      overlay=True, alpha=0.5, show_plot=False, save_output_path='')

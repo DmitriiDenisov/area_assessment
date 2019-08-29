@@ -8,8 +8,12 @@ import logging
 from PIL import Image
 
 
-def just_show_numpy_as_image(numpy_array):
-    img = Image.fromarray(numpy_array.astype(np.uint8), 'RGB')
+def just_show_numpy_as_image(numpy_array, type, name):
+    if type == 'RGB':
+        img = Image.fromarray(numpy_array.astype(np.uint8), 'RGB')
+    else:
+        img = Image.fromarray(numpy_array.astype(np.uint8))
+    img.save(name)
     img.show()
 
 def plot1(img, name=None, show_plot=False, save_output_path=None):

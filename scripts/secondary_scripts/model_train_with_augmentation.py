@@ -132,7 +132,7 @@ for k in range(len(angles)):
 
 print('augmented sat_patches.shape: {}'.format(sat_patches.shape))
 print('augmented map_patches.shape: {}'.format(map_patches.shape))
-1 / 0
+1/0
 
 # FIT MODEL AND SAVE WEIGHTS
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))

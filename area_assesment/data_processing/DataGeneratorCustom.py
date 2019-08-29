@@ -4,9 +4,9 @@ from os.path import isfile, join
 import numpy as np
 from keras_preprocessing.image import load_img
 
-# numpy.rot90(orignumpyarray,3)
+from area_assesment.images_processing.patching import array2patches_new
 from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.io_operations.visualization import just_show_numpy_as_image
+from area_assesment.io_operations.visualization import just_show_numpy_as_image, plot2
 
 
 class DataGeneratorCustom:
@@ -17,13 +17,58 @@ class DataGeneratorCustom:
         self.files_names = [f for f in listdir(train_dir) if isfile(join(train_dir, f))]
         self.load_one_time_images = load_one_time_images
 
+    def __iter__(self):
+        while True:
+            file_names = np.random.permutation(self.files_names)
+            file_names_iter = iter(file_names)
+            # batch_train_file_names = list(islice(file_names_iter, self.load_one_time_images))
+            for f in file_names:
+                # print(batch_train_file_names)
+                f_image = np.array(load_img(join(self.train_dir, f), grayscale=False))
+                f_mask = np.array(load_img(join(self.train_masks_dir, '{}_MAP.tif'.format(f[:-4])), grayscale=True))
+
+                # x_train_batch = np.array([np.array(load_img(join(self.train_dir, f), grayscale=False))
+                #                          / 255 for f in batch_train_file_names])
+                # name_map = f[:-4] + '_MAP' + '.tif'
+                # y_train_batch = np.array([np.array(load_img(join(self.train_masks_dir, f[:-4] + '_MAP' + '.tif'), grayscale=True))
+                #                          / 255 for f in batch_train_file_names])
+                f_mask = f_mask.reshape((f_mask.shape + (1,)))
+
+                # Get pathces
+                # aug_x_batch = np.array([], dtype=np.int64).reshape((0, ) + (64, 64, 3))
+                # aug_y_batch = np.array([], dtype=np.int64).reshape((0, ) + (64, 64, 1))
+                x_train_batch = array2patches_new(f_image, patch_size=(64, 64), step_size=32)
+                y_train_batch = array2patches_new(f_mask, patch_size=(64, 64), step_size=32)
+                # aug_x_batch = np.vstack([aug_x_batch, x_temp])
+                # aug_y_batch = np.vstack([aug_y_batch, y_temp])
+                del f_image, f_mask
+
+                # get random rotations
+                x_batch_rotaed, y_batch_rotated = self.get_rotations(x_train_batch, y_train_batch, [1, 2, 3])
+                # Unite all of them
+                x_train_batch = np.concatenate((x_train_batch, x_batch_rotaed), axis=0)
+                y_train_batch = np.concatenate((y_train_batch, y_batch_rotated), axis=0)
+                # random.permutation
+                del x_batch_rotaed, y_batch_rotated
+
+                p = np.random.permutation(len(x_train_batch))
+                x_train_batch = x_train_batch[p]
+                y_train_batch = y_train_batch[p]
+
+                # yeild
+                # iter_over_batch = iter(x_train_batch_new)
+                # list(islice(file_names_iter, self.load_one_time_images))
+
+                for i in range(0, len(x_train_batch), self.batch_size):
+                    yield x_train_batch[i: i + self.batch_size], y_train_batch[i: i + self.batch_size]
+
     def get_rotations(self, x_train_batch, y_train_batch, rotation_list):
         target_shape_x = list(x_train_batch.shape)
         target_shape_x[0] = 0
         target_shape_y = list(y_train_batch.shape)
         target_shape_y[0] = 0
-        rotated_batch_x = np.array([]).reshape(target_shape_x)
-        rotated_batch_y = np.array([]).reshape(target_shape_y)
+        rotated_batch_x = np.array([], dtype=np.uint8).reshape(target_shape_x)
+        rotated_batch_y = np.array([], dtype=np.uint8).reshape(target_shape_y)
         for i in rotation_list:
             x_temp = np.rot90(x_train_batch, axes=(1, 2), k=i)
             y_temp = np.rot90(y_train_batch, axes=(1, 2), k=i)
@@ -31,51 +76,19 @@ class DataGeneratorCustom:
             rotated_batch_y = np.concatenate((rotated_batch_y, y_temp), axis=0)
         return rotated_batch_x, rotated_batch_y
 
-    def __iter__(self):
-        while True:
-            file_names = np.random.permutation(self.files_names)
-            file_names_iter = iter(file_names)
-            batch_train_file_names = list(islice(file_names_iter, self.load_one_time_images))
-            while batch_train_file_names:
-                # print(batch_train_file_names)
-                x_train_batch = np.array([np.array(load_img(join(self.train_dir, f), grayscale=False))
-                                          / 255 for f in batch_train_file_names])
-                y_train_batch = np.array([np.array(load_img(join(self.train_masks_dir, f), grayscale=True))
-                                          / 255 for f in batch_train_file_names])
-                y_train_batch = y_train_batch.reshape((y_train_batch.shape + (1,)))
 
-                # get random rotations
-                x_batch_rotaed, y_batch_rotated = self.get_rotations(x_train_batch, y_train_batch, [1, 2, 3])
-                # Unite all of them
-                x_train_batch_new = np.concatenate((x_train_batch, x_batch_rotaed), axis=0)
-                y_train_batch_new = np.concatenate((y_train_batch, y_batch_rotated), axis=0)
-                # random.permutation
-                p = np.random.permutation(len(x_train_batch_new))
-                x_train_batch_new = x_train_batch_new[p]
-                y_train_batch_new = y_train_batch_new[p]
-
-                # yeild
-                # iter_over_batch = iter(x_train_batch_new)
-                # list(islice(file_names_iter, self.load_one_time_images))
-
-                for i in range(0, len(x_train_batch_new), self.batch_size):
-                    yield x_train_batch_new[i: i + self.batch_size], y_train_batch_new[i: i + self.batch_size]
-                batch_train_file_names = list(islice(file_names_iter, self.load_one_time_images))
-
-
-# Wrapper over reading-files generator
-def create_aug_gen(in_gen):
-    for in_x, in_y in in_gen:
-        g_x = image_gen.flow(255 * in_x, in_y,
-                             batch_size=in_x.shape[0])
-        x, y = next(g_x)
-        yield x / 255.0, y
-
-
-train_dir = '../../data/test_data/sat'
+train_dir = '../../data/train/big_sat'
 file_names = filenames_in_dir(train_dir, endswith_='.tif')
 train_file_names = np.random.permutation(file_names)[:round(0.8 * len(file_names))]
 valid_file_names = np.random.permutation(file_names)[round(0.8 * len(file_names)):]
+
 gen = iter(
-    DataGeneratorCustom(batch_size=2, train_dir='../../data/test_data/sat', train_masks_dir='../../data/test_data/map'))
-next(gen)
+    DataGeneratorCustom(batch_size=2, train_dir='../../data/train/big_sat', train_masks_dir='../../data/train/map'))
+i = 0
+while True:
+    a, b = next(gen)
+    for j in range(len(a)):
+        plot2(a[j], b[j].reshape((64, 64)), show_plot=False, save_output_path='', name='test_{}.png'.format(i))
+        i += 1
+    if i >= 20:
+        1 / 0
