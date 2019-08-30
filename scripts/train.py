@@ -2,15 +2,9 @@ import os
 import logging
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
-
 from area_assesment.neural_networks.DataGeneratorCustom import DataGeneratorCustom
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.neural_networks.cnn import *
-
-#########################################################
-# RUN ON SERVER
-# PYTHONPATH=~/area_assesment/ python3 images_augmentation.py
-#########################################################
 from area_assesment.neural_networks.logger import TensorBoardBatchLogger
 from area_assesment.neural_networks.unet import unet
 
