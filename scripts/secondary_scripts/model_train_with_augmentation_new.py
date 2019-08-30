@@ -69,7 +69,6 @@ checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
                              monitor='val_jaccard_coef', save_best_only=True)
 
 a = 3
-b = 4
 
 model.fit_generator(
     generator=train_data_gen,
