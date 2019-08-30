@@ -6,6 +6,8 @@ from keras.callbacks import TensorBoard, ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.feature_extraction.image import *
 from sklearn.metrics import jaccard_similarity_score
+
+from area_assesment.data_processing.DataGeneratorCustom import DataGeneratorCustom
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.images_processing.patching import array2patches, rotateImage, array2patches_new
 from area_assesment.io_operations.visualization import plot2
