@@ -89,10 +89,10 @@ class DataGeneratorCustom:
             total += temp
         return total
 
-train_dir = '../../data/train/big_sat'
-file_names = filenames_in_dir(train_dir, endswith_='.tif')
-train_file_names = np.random.permutation(file_names)[:round(0.8 * len(file_names))]
-valid_file_names = np.random.permutation(file_names)[round(0.8 * len(file_names)):]
+#train_dir = '../../data/train/big_sat'
+##file_names = filenames_in_dir(train_dir, endswith_='.tif')
+##train_file_names = np.random.permutation(file_names)[:round(0.8 * len(file_names))]
+##valid_file_names = np.random.permutation(file_names)[round(0.8 * len(file_names)):]
 
 #gen = DataGeneratorCustom(batch_size=2, train_dir='../../data/train/big_sat', train_masks_dir='../../data/train/map')
 # i = 0

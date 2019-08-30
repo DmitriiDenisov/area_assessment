@@ -35,6 +35,7 @@ else:
 nn_input_patch_size = (64, 64) # (1024, 1024)  # (1024, 1024)  # (64, 64)
 nn_output_patch_size = (64, 64) # (128, 128)  # (256, 256) # (16, 16)
 step_size = 32  # 256  # 16
+batch_size = 4
 
 # MODEL SETTINGS
 epochs = 100
@@ -44,15 +45,17 @@ net_weights_dir_save = os.path.normpath('../../weights/unet_mecca')
 
 # Generators
 train_dir = '../../data/train/sat'
+train_masks_dir = '../../data/train/map'
 val_dir = '../../data/val/sat'
+val_masks_dir = '../../data/val/map'
 file_names = filenames_in_dir(train_dir, endswith_='.tif')
 train_file_names = np.random.permutation(file_names)[:round(0.8 * len(file_names))]
 valid_file_names = np.random.permutation(file_names)[round(0.8 * len(file_names)):]
-train_data_gen = DataGeneratorCustom(batch_size=4, train_dir='../../data/train/sat', train_masks_dir='../../data/train/map', patch_size=nn_input_patch_size, step_size=step_size)
-step_per_epoch = train_data_gen.step_per_epoch
+train_data_gen = DataGeneratorCustom(batch_size=batch_size, train_dir=train_dir, train_masks_dir=train_masks_dir, patch_size=nn_input_patch_size, step_size=step_size)
+step_per_epoch = train_data_gen.step_per_epoch // batch_size
 train_data_gen = iter(train_data_gen)
-val_data_gen = DataGeneratorCustom(batch_size=4, train_dir='../../data/val/sat', train_masks_dir='../../data/val/map', patch_size=nn_input_patch_size, step_size=step_size)
-step_per_val = val_data_gen.step_per_epoch
+val_data_gen = DataGeneratorCustom(batch_size=batch_size, train_dir=val_dir, train_masks_dir=val_masks_dir, patch_size=nn_input_patch_size, step_size=step_size)
+step_per_val = val_data_gen.step_per_epoch // batch_size
 val_data_gen = iter(val_data_gen)
 
 
@@ -63,8 +66,6 @@ tb_callback = TensorBoardBatchLogger(project_path='../../', batch_size=1, log_ev
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
                              'w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}_valjaccard{val_jaccard_coef:.4f}.hdf5'),
                              monitor='val_jaccard_coef', save_best_only=True)
-
-a = 3
 
 model.fit_generator(
     generator=train_data_gen,
