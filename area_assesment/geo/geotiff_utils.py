@@ -29,6 +29,7 @@ def write_geotiff(path: str, raster_layers: np.array, gdal_ds: str):
     out_raster.FlushCache()
     logging.info('GEOTIFF SAVED: {}'.format(path))
 
+
 def write_geotiff_cut_image(output_file, gdal_ds, new_image, row_number, col_number, path_size):
     # '../../data/train/big_sat/mecca_google.ешаэ
     # gdal_ds = gdal.Open(path_file)

@@ -1,13 +1,9 @@
 import os
-import numpy as np
 import logging
 from keras.callbacks import ModelCheckpoint
-from os.path import isfile, join
-from os import listdir
 
-from area_assesment.data_processing.DataGeneratorCustom import DataGeneratorCustom
+from area_assesment.neural_networks.DataGeneratorCustom import DataGeneratorCustom
 from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.io_operations.visualization import plot2
 from area_assesment.neural_networks.cnn import *
 
 #########################################################
