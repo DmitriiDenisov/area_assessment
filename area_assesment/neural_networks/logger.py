@@ -7,13 +7,12 @@ import time
 
 
 class TensorBoardBatchLogger(TensorBoard):
-    def __init__(self, project_path, batch_size, log_every=1, VERBOSE=0, **kwargs):
+    def __init__(self, project_path, log_every=1, VERBOSE=0, **kwargs):
         tf.summary.FileWriterCache.clear()
         self.project_path = project_path
-        self.batch_size = batch_size
         self.log_dir = self._create_run_folder()
 
-        super().__init__(log_dir=self.log_dir, batch_size=self.batch_size, **kwargs)
+        super().__init__(log_dir=self.log_dir, **kwargs)
         self.log_every = log_every
         self.counter = 0
         self.sum_loss = 0

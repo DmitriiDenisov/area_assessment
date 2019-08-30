@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw
 from skimage.draw import polygon
 import numpy as np
 
+
 # Скрипт читает изображения из папки source_dir. Для каждого изображения создается изображение в папке
 # target_dir с такими же размерами и таким же названием + '_MAP'
 
@@ -31,7 +32,7 @@ def convert_coords_norm(dict_new_polygons, geo_transform):
     return dict_norm_polygons
 
 
-source_dir = '../../data/train/big_sat'
+source_dir = '../../data/train/sat'
 target_dir = '../../data/train/map'
 P3857 = Proj(init='epsg:3857')
 P4326 = Proj(init='epsg:4326')
