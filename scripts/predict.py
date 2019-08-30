@@ -11,7 +11,7 @@ from area_assesment.images_processing.patching import array2patches, patches2arr
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.io_operations.visualization import plot3, plot2, plot1
 from area_assesment.neural_networks.cnn import *
-from area_assesment.geo.utils import write_geotiff
+# from area_assesment.geo.utils import write_geotiff
 
 from keras.models import load_model
 from area_assesment.neural_networks.metrics import fmeasure, precision, recall, jaccard_coef
@@ -139,8 +139,8 @@ for i, f_sat in enumerate(valid_sat_files):
               show_plot=False, save_output_path=output_folder)
 
     # WRITE GEOTIFF
-    geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(os.path.basename(f_sat)[:-5]))
-    write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
+    #geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(os.path.basename(f_sat)[:-5]))
+    #write_geotiff(geotiff_output_path, raster_layers=(map_pred*255).astype('int'), gdal_ds=f_sat)
 
     # WRITE npy (for test)
     # npy_output_path = os.path.join(output_folder, '{}_NUMPY.npy'.format(os.path.basename(f_sat)[:-4]))
@@ -149,4 +149,4 @@ for i, f_sat in enumerate(valid_sat_files):
     from PIL import Image
 
     im = Image.fromarray((map_pred * 255).astype(np.uint8))
-    im.save(join(output_folder, "map_pred_{}.tif".format(i + 1)))
+    im.save("map_pred_{}.tif".format(i + 1))

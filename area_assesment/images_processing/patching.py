@@ -156,7 +156,7 @@ def patches2array(patches, img_size, nn_input_patch_size=(64, 64), nn_output_pat
     patches_in_col = round(
         (img_size[0] - nn_input_patch_size[1]) / step_size)  # (img_size[0] - nn_input_patch_size[0]) // step_size
     logging.debug('patches2array: patches_in_row: {}, patches_in_col: {}'.format(patches_in_row, patches_in_col))
-    arr = np.empty(img_size)
+    arr = np.zeros(img_size)
     logging.debug('patches2array: patches.shape: {}'.format(patches.shape))
     logging.debug('patches2array: arr.shape: {}'.format(arr.shape))
     margin_hor = (nn_input_patch_size[0] - nn_output_patch_size[0]) // 2
