@@ -19,20 +19,22 @@ step_size = 32  # 256  # 16
 epochs = 100
 batch_size = 4
 net_weights_load = None
-net_weights_load = '../weights/unet/buildings-unet_64x64x3_epoch712_iu0.9133_val_iu0.9472.hdf5'
-net_weights_load = '../weights/unet/unet_adam_64x64_epoch01_jaccard0.9510_valjaccard0.9946.hdf5'
+# net_weights_load = '../weights/unet/buildings-unet_64x64x3_epoch712_iu0.9133_val_iu0.9472.hdf5'
+# net_weights_load = '../weights/unet/unet_adam_64x64_epoch01_jaccard0.9510_valjaccard0.9946.hdf5'
 # net_weights_load = '../weights/cnn_v7/sakaka_cnn_v7_jaccard0.2528_valjaccard0.0406.hdf5'
 # net_weights_load = '../weights/cnn_v7/w_epoch03_jaccard0.3890_valjaccard0.1482.hdf5'
 net_weights_dir_save = os.path.normpath('../weights/unet_mecca')
 train_dir = '../data/train/sat'
 train_masks_dir = '../data/train/map'
+train_nokia_poly = '../data/train/nokia_map'
 val_dir = '../data/val/sat'
 val_masks_dir = '../data/val/map'
+val_nokia_poly = '../data/val/nokia_map'
 
 # MODEL DEFINITION
 
 if not net_weights_load:
-    model = unet(64, 64, 3)
+    model = unet(64, 64, 4)
     model.summary()
     pass
 else:
@@ -58,6 +60,7 @@ valid_file_names = np.random.permutation(file_names)[round(0.8 * len(file_names)
 train_data_gen = DataGeneratorCustom(batch_size=batch_size,
                                      train_dir=train_dir,
                                      train_masks_dir=train_masks_dir,
+                                     train_nokia_poly=train_nokia_poly,
                                      patch_size=nn_input_patch_size,
                                      step_size=step_size,
                                      target_shape=target_shape)
@@ -66,6 +69,7 @@ train_data_gen = iter(train_data_gen)
 val_data_gen = DataGeneratorCustom(batch_size=batch_size,
                                    train_dir=val_dir,
                                    train_masks_dir=val_masks_dir,
+                                   train_nokia_poly=val_nokia_poly,
                                    patch_size=nn_input_patch_size,
                                    step_size=step_size,
                                    target_shape=target_shape)

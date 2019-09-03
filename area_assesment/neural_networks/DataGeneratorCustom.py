@@ -113,25 +113,26 @@ class DataGeneratorCustom:
 ##train_file_names = np.random.permutation(file_names)[:round(0.8 * len(file_names))]
 ##valid_file_names = np.random.permutation(file_names)[round(0.8 * len(file_names)):]
 
-gen = DataGeneratorCustom(batch_size=2,
-                          step_size=32,
-                          patch_size=(64, 64),
-                          target_shape=(64, 64, 2),
-                          train_dir='../../data/train/sat',
-                          train_masks_dir='../../data/train/map',
-                          train_nokia_poly='../../data/train/nokia_map'
-                          )
-i = 0
+if __name__ == '__main__':
+    gen = DataGeneratorCustom(batch_size=2,
+                              step_size=32,
+                              patch_size=(64, 64),
+                              target_shape=(64, 64, 2),
+                              train_dir='../../data/train/sat',
+                              train_masks_dir='../../data/train/map',
+                              train_nokia_poly='../../data/train/nokia_map'
+                              )
+    i = 0
 
-# for i in gen:
-#    a, b = i[0], i[1]
-#    pass
+    # for i in gen:
+    #    a, b = i[0], i[1]
+    #    pass
 
-while True:
-    for a, b in gen:
-        pass
-        # for j in range(len(a)):
-        #    plot2(a[j], b[j].reshape((64, 64)), show_plot=False, save_output_path='', name='test_{}.png'.format(i))
-        #    i += 1
-        # if i >= 20:
-        #    1 / 0
+    while True:
+        for a, b in gen:
+            pass
+            # for j in range(len(a)):
+            #    plot2(a[j], b[j].reshape((64, 64)), show_plot=False, save_output_path='', name='test_{}.png'.format(i))
+            #    i += 1
+            # if i >= 20:
+            #    1 / 0
