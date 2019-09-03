@@ -43,6 +43,3 @@ def unet(patch_height, patch_width, n_ch):
     model.compile(optimizer='sgd', loss='binary_crossentropy', metrics=['binary_accuracy', precision,
                                                                         recall, fmeasure, jaccard_coef])
     return model
-
-
-

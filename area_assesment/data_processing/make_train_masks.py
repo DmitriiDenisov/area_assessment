@@ -34,10 +34,13 @@ def convert_coords_norm(dict_new_polygons, geo_transform):
 
 source_dir = '../../data/train/sat'
 target_dir = '../../data/train/map'
+geojson_path = "../../data/train/Polygon_layer__2.geojson"
+print(geojson_path)
+
 P3857 = Proj(init='epsg:3857')
 P4326 = Proj(init='epsg:4326')
 # Прочитать json
-guestFile = open("../../data/train/features.geojson", 'r')
+guestFile = open(geojson_path, 'r')
 guestData = guestFile.read()
 guestFile.close()
 gdfJson = json.loads(guestData)
