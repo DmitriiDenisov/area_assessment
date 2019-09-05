@@ -3,6 +3,7 @@ import os
 import cv2
 from pyproj import Proj, transform
 import json
+from tqdm import tqdm
 import gdal
 from gdalconst import GA_ReadOnly
 from area_assesment.io_operations.visualization import plot2
@@ -34,7 +35,7 @@ def convert_coords_norm(dict_new_polygons, geo_transform):
 
 source_dir = '../../data/train/sat'
 target_dir = '../../data/train/map'
-geojson_path = "../../data/train/Polygon_layer__2.geojson"
+geojson_path = "../../data/train/Polygon_layer__3.geojson"
 print(geojson_path)
 
 P3857 = Proj(init='epsg:3857')
@@ -60,10 +61,14 @@ for f in list_of_files:
 
     # Перевести координаты long/lat в EPSG:3857
     dict_new_polygons = {}
-    for poly_dict in gdfJson['features']:
+    for poly_dict in tqdm(gdfJson['features']):
+        if len(poly_dict['geometry']['coordinates'][0]) == 1:
+            list_coords = poly_dict['geometry']['coordinates'][0][0]
+        else:
+            list_coords = poly_dict['geometry']['coordinates'][0]
         id = poly_dict['id']
         converted_coords = []
-        for (lon, lat) in poly_dict['geometry']['coordinates'][0]:
+        for (lon, lat) in list_coords:
             x, y = transform(P4326, P3857, lon, lat)
             converted_coords.append([x, y])
         dict_new_polygons[id] = converted_coords[:]
@@ -85,7 +90,13 @@ for f in list_of_files:
         try:
             new_mask[rr, cc] = 1
         except:
-            pass
+            new_cc = cc[cc < new_mask.shape[1]]
+            new_rr = rr[cc < new_mask.shape[1]]
+
+            new_new_rr = new_rr[new_rr < new_mask.shape[0]]
+            new_new_cc = new_cc[new_rr < new_mask.shape[0]]
+
+            new_mask[new_new_rr, new_new_cc] = 1
 
     im = Image.fromarray(new_mask * 255)
     path_ = os.path.join(target_dir, "{}_MAP.tif".format(f[:-4]))

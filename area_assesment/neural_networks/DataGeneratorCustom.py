@@ -28,10 +28,13 @@ class DataGeneratorCustom:
             for f in file_names:
                 # print(batch_train_file_names)
                 f_image = np.array(load_img(join(self.train_dir, f), grayscale=False))
+                # f_image = f_image / 255
                 f_mask = np.array(load_img(join(self.train_masks_dir, '{}_MAP.tif'.format(f[:-4])), grayscale=True))
+                f_mask = (f_mask / 255).astype(np.uint8)
                 f_nokia = np.array(
                     load_img(join(self.train_nokia_poly, '{}_NOKIA.tif'.format(f[:-4])), grayscale=False))
                 f_nokia = self.get_mask_nokia_map(f_nokia)
+                f_nokia = (f_nokia / 255).astype(np.uint8)
                 # x_train_batch = np.array([np.array(load_img(join(self.train_dir, f), grayscale=False))
                 #                          / 255 for f in batch_train_file_names])
                 # name_map = f[:-4] + '_MAP' + '.tif'
@@ -71,20 +74,22 @@ class DataGeneratorCustom:
                 x_train_batch = x_train_batch[p]
                 y_train_batch = y_train_batch[p]
 
+                # x_train_batch = x_train_batch[:, :, :, 3].reshape(x_train_batch.shape[:-1] + (1, )) # !!!!!!!!!!
+                x_train_batch = x_train_batch[:, :, :, :3] #.reshape(x_train_batch[:, :, :, 3].shape + (1,))  # !!!!!!!!!!
                 # yeild
                 # iter_over_batch = iter(x_train_batch_new)
                 # list(islice(file_names_iter, self.load_one_time_images))
                 if self.target_shape[-1] == 2:
                     y_train_batch = np.concatenate([y_train_batch, 1 - y_train_batch], axis=-1)
-                else:
+                elif self.target_shape[-1] != 1:
                     y_train_batch = y_train_batch.reshape(y_train_batch.shape[:-1])
 
                 for i in range(0, len(x_train_batch), self.batch_size):
-                    yield x_train_batch[i: i + self.batch_size], y_train_batch[i: i + self.batch_size]
+                    yield x_train_batch[i: i + self.batch_size] / 255, y_train_batch[i: i + self.batch_size]
 
     def get_mask_nokia_map(self, f_nokia):
         pixel1 = [238, 243, 245]
-        mask = ((f_nokia[:, :, ] == pixel1)).all(axis=-1).astype(np.uint8)
+        mask = (f_nokia[:, :, ] == pixel1).all(axis=-1).astype(np.uint8)
         return mask * 255
 
     def get_rotations(self, batch, rotation_list):
@@ -129,8 +134,13 @@ if __name__ == '__main__':
     #    pass
 
     while True:
+        i = 0
         for a, b in gen:
-            pass
+            just_show_numpy_as_image((a[0]*255).astype(np.uint8), type='RGB', name='trash/sat_im_{}.tif'.format(i))
+            just_show_numpy_as_image((b[0]*255), type='not_RGB', name='trash/map_im_{}.tif'.format(i))
+            i += 1
+            if i > 10:
+                1 / 0
             # for j in range(len(a)):
             #    plot2(a[j], b[j].reshape((64, 64)), show_plot=False, save_output_path='', name='test_{}.png'.format(i))
             #    i += 1

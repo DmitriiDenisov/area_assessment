@@ -1,4 +1,6 @@
-import os
+import os, sys
+PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(PROJECT_PATH) # чтобы из консольки можно было запускать
 import logging
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
@@ -6,7 +8,7 @@ from area_assesment.neural_networks.DataGeneratorCustom import DataGeneratorCust
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.neural_networks.cnn import *
 from area_assesment.neural_networks.logger import TensorBoardBatchLogger
-from area_assesment.neural_networks.unet import unet
+from area_assesment.neural_networks.unet import unet, build_model, unet2, unet_old
 
 logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.DEBUG,
                     handlers=[logging.StreamHandler()])
@@ -34,9 +36,16 @@ val_nokia_poly = '../data/val/nokia_map'
 # MODEL DEFINITION
 
 if not net_weights_load:
-    model = unet(64, 64, 4)
+    # model = unet_old(64, 64, 4)
+    # model.summary()
+    model = unet2((64, 64, 3))
+    # model = unet(input_size=(64, 64, 1))
+    # input_layer = Input((64, 64, 4))
+    # output_layer = build_model(input_layer, 16, 0.5)
+    # model = Model(input_layer, output_layer)
+    # model.compile(loss='binary_crossentropy', optimizer="adam", metrics=[dice_coef_K])
     model.summary()
-    pass
+
 else:
     # LOADING PREVIOUS WEIGHTS OF MODEL
     logging.info('LOADING PREVIOUS WEIGHTS OF MODEL: {}'.format(net_weights_load))
@@ -79,16 +88,16 @@ val_data_gen = iter(val_data_gen)
 # FIT MODEL AND SAVE WEIGHTS
 logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weights_dir_save))
 
-tb_callback = TensorBoardBatchLogger(project_path='../', log_every=1)
+tb_callback = TensorBoardBatchLogger(project_path='../', log_every=4)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                                          'w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}_valjaccard{val_jaccard_coef:.4f}.hdf5'),
-                             monitor='val_jaccard_coef', save_best_only=True)
+                                          'new_model_w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}.hdf5'), #valjaccard{val_jaccard_coef:.4f}
+                             monitor='jaccard_coef', save_best_only=True)
 
 model.fit_generator(
     generator=train_data_gen,
     steps_per_epoch=step_per_epoch,
-    validation_data=val_data_gen,
-    validation_steps=step_per_val,
+    # validation_data=val_data_gen,
+    # validation_steps=step_per_val,
     epochs=epochs,
     callbacks=[checkpoint, tb_callback],
     verbose=1)

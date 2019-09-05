@@ -9,7 +9,7 @@ import logging
 
 from area_assesment.images_processing.patching import array2patches, patches2array
 from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.io_operations.visualization import plot3, plot2, plot1
+from area_assesment.io_operations.visualization import plot3, plot2, plot1, save_mask_and_im_overlayer
 from area_assesment.neural_networks.cnn import *
 from area_assesment.geo.utils import write_geotiff
 
@@ -29,13 +29,15 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 MODEL_PATH = '../weights/unet/buildings-unet_64x64x3_epoch712_iu0.9133_val_iu0.9472.hdf5'
+MODEL_PATH = '../weights/unet_mecca/new_model_w_epoch07_jaccard0.5760.hdf5'
 print('Loading model from {}'.format(MODEL_PATH))
 model = load_model(MODEL_PATH,
                    custom_objects={
                        "precision": precision,
                        "recall": recall,
                        "fmeasure": fmeasure,
-                       "jaccard_coef": jaccard_coef
+                       "jaccard_coef": jaccard_coef,
+                       "dice_coef_K": dice_coef_K
                    }
                    )
 
@@ -47,7 +49,7 @@ subpatch_size = (64, 64)
 step_size = 64
 
 # dir_test = os.path.normpath('../sakaka_data/buildings/valid/sat/')  # '../../data/mass_buildings/valid/'
-dir_test = os.path.normpath('../data/test/res_artifacts')  # '../../data/mass_buildings/valid/'
+dir_test = os.path.normpath('../data/val/sat')  # '../../data/mass_buildings/valid/'
 # dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
 # output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_128x128_epoch446_subpatch64_stepsize64/')
 output_folder = os.path.normpath('../output_data/Mecca')
@@ -126,12 +128,13 @@ for i, f_sat in enumerate(valid_sat_files):
     # plt.show()
 
 
-    if False:
+    if True:
         # PLOT OVERLAY IMG, MASK_PRED
-        plot2(img_sat_, map_pred, name='{}_OVERLAY_HEATMAP_stepsize{}_subpatchsize{}'.format(os.path.basename(f_sat)[:-5],
-                                                                                             step_size, subpatch_size[0]),
-              overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
-
+        #plot2((img_sat_*255).astype(np.uint8), (map_pred*255).astype(np.uint8), name='{}_OVERLAY_HEATMAP_stepsize{}_subpatchsize{}'.format(os.path.basename(f_sat)[:-5],
+        #                                                                                     step_size, subpatch_size[0]),
+        #      overlay=True, alpha=0.5, show_plot=False, save_output_path=output_folder)
+        save_mask_and_im_overlayer(img_sat, map_pred, save_output_path='overlay_test.tif')
+        1 / 0
         plot1(map_pred, name='{}_HEATMAP_stepsize{}'.format(f_sat.split('/')[-1][:-4], step_size, nn_output_patch_size[0]),
               show_plot=False, save_output_path=output_folder)
 
