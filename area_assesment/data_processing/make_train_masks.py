@@ -10,6 +10,7 @@ from area_assesment.io_operations.visualization import plot2
 from PIL import Image, ImageDraw
 from skimage.draw import polygon
 import numpy as np
+import json
 
 
 # Скрипт читает изображения из папки source_dir. Для каждого изображения создается изображение в папке
@@ -35,7 +36,7 @@ def convert_coords_norm(dict_new_polygons, geo_transform):
 
 source_dir = '../../data/train/sat'
 target_dir = '../../data/train/map'
-geojson_path = "../../data/train/Polygon_layer__3.geojson"
+geojson_path = "../../data/train/NN_predict_0_geojson_1.geojson"
 print(geojson_path)
 
 P3857 = Proj(init='epsg:3857')
@@ -46,6 +47,34 @@ guestData = guestFile.read()
 guestFile.close()
 gdfJson = json.loads(guestData)
 
+
+def f(lon_lat):
+    return list(transform(P4326, P3857, lon_lat[0], lon_lat[1]))
+
+
+# Перевести координаты long/lat в EPSG:3857
+dict_new_polygons = {}
+for poly_dict in tqdm(gdfJson['features']):
+    if len(poly_dict['geometry']['coordinates'][0]) == 1:
+        list_coords = poly_dict['geometry']['coordinates'][0][0]
+    else:
+        list_coords = poly_dict['geometry']['coordinates'][0]
+    id = poly_dict['id']
+    converted_coords = []
+
+    # converted_coords = [list(transform(P4326, P3857, lon, lat)) for (lon, lat) in list_coords]
+    # converted_coords = np.array(list(map(f, list_coords)))
+    converted_coords = np.apply_along_axis(f, 1, list_coords).tolist()
+
+    # for (lon, lat) in list_coords:
+    #    x, y = transform(P4326, P3857, lon, lat)
+    #    converted_coords.append([x, y])
+    dict_new_polygons[id] = converted_coords[:]
+
+# Save new json
+with open('../../data/train/dict_new_polygons.json', 'w') as fp:
+    json.dump(dict_new_polygons, fp)
+
 list_of_files = [f for f in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, f)) and f[-4:] == '.tif']
 print('Total number of files: {}'.format(len(list_of_files)))
 for f in list_of_files:
@@ -53,25 +82,10 @@ for f in list_of_files:
     cur_file_path = os.path.join(source_dir, f)
     # Прочитать изображение
     img_sat = cv2.imread(cur_file_path)
-
     gdal_ds = gdal.Open(cur_file_path, GA_ReadOnly)
     geo_transform = gdal_ds.GetGeoTransform()
     raster_x_size = gdal_ds.RasterXSize
     projection_wkt = gdal_ds.GetProjection()
-
-    # Перевести координаты long/lat в EPSG:3857
-    dict_new_polygons = {}
-    for poly_dict in tqdm(gdfJson['features']):
-        if len(poly_dict['geometry']['coordinates'][0]) == 1:
-            list_coords = poly_dict['geometry']['coordinates'][0][0]
-        else:
-            list_coords = poly_dict['geometry']['coordinates'][0]
-        id = poly_dict['id']
-        converted_coords = []
-        for (lon, lat) in list_coords:
-            x, y = transform(P4326, P3857, lon, lat)
-            converted_coords.append([x, y])
-        dict_new_polygons[id] = converted_coords[:]
 
     # Получить из относительных координат маску
     dict_norm_polygons = convert_coords_norm(dict_new_polygons, gdal_ds.GetGeoTransform())

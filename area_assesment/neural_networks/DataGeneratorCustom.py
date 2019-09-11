@@ -10,12 +10,14 @@ from area_assesment.io_operations.visualization import just_show_numpy_as_image,
 
 
 class DataGeneratorCustom:
-    def __init__(self, batch_size, train_dir, train_masks_dir, train_nokia_poly, step_size, patch_size, target_shape):
+    def __init__(self, batch_size, train_dir, train_masks_dir, train_nokia_poly, step_size, patch_size, target_shape, nokia_map=False):
         self.batch_size = batch_size
         self.step_size = step_size
         self.patch_size = patch_size
         self.train_dir = train_dir
-        self.train_nokia_poly = train_nokia_poly
+        self.nokia_map = nokia_map
+        if self.nokia_map:
+            self.train_nokia_poly = train_nokia_poly
         self.train_masks_dir = train_masks_dir
         self.files_names = [f for f in listdir(train_dir) if isfile(join(train_dir, f))]
         self.step_per_epoch = self.get_step_pe_epoch()
@@ -31,51 +33,61 @@ class DataGeneratorCustom:
                 # f_image = f_image / 255
                 f_mask = np.array(load_img(join(self.train_masks_dir, '{}_MAP.tif'.format(f[:-4])), grayscale=True))
                 f_mask = (f_mask / 255).astype(np.uint8)
-                f_nokia = np.array(
-                    load_img(join(self.train_nokia_poly, '{}_NOKIA.tif'.format(f[:-4])), grayscale=False))
-                f_nokia = self.get_mask_nokia_map(f_nokia)
-                f_nokia = (f_nokia / 255).astype(np.uint8)
+                if self.nokia_map:
+                    f_nokia = np.array(
+                        load_img(join(self.train_nokia_poly, '{}_NOKIA.tif'.format(f[:-4])), grayscale=False))
+                    f_nokia = self.get_mask_nokia_map(f_nokia)
+                    f_nokia = (f_nokia / 255).astype(np.uint8)
+                    f_nokia = f_nokia.reshape((f_nokia.shape + (1,)))
                 # x_train_batch = np.array([np.array(load_img(join(self.train_dir, f), grayscale=False))
                 #                          / 255 for f in batch_train_file_names])
                 # name_map = f[:-4] + '_MAP' + '.tif'
                 # y_train_batch = np.array([np.array(load_img(join(self.train_masks_dir, f[:-4] + '_MAP' + '.tif'), grayscale=True))
                 #                          / 255 for f in batch_train_file_names])
                 f_mask = f_mask.reshape((f_mask.shape + (1,)))
-                f_nokia = f_nokia.reshape((f_nokia.shape + (1,)))
+
 
                 # Get pathces
                 # aug_x_batch = np.array([], dtype=np.int64).reshape((0, ) + (64, 64, 3))
                 # aug_y_batch = np.array([], dtype=np.int64).reshape((0, ) + (64, 64, 1))
                 x_train_batch = array2patches_new(f_image, patch_size=self.patch_size, step_size=self.step_size)
                 y_train_batch = array2patches_new(f_mask, patch_size=self.patch_size, step_size=self.step_size)
-                x_nokia_batch = array2patches_new(f_nokia, patch_size=self.patch_size, step_size=self.step_size)
+                if self.nokia_map:
+                    x_nokia_batch = array2patches_new(f_nokia, patch_size=self.patch_size, step_size=self.step_size)
 
                 # aug_x_batch = np.vstack([aug_x_batch, x_temp])
                 # aug_y_batch = np.vstack([aug_y_batch, y_temp])
-                del f_image, f_mask, f_nokia
+                del f_image, f_mask
+                if self.nokia_map:
+                    del f_nokia
 
                 # get random rotations
                 x_batch_rotaed = self.get_rotations(x_train_batch, rotation_list=[1, 2, 3])
                 y_batch_rotated = self.get_rotations(y_train_batch, rotation_list=[1, 2, 3])
-                x_nokia_batch_rotated = self.get_rotations(x_nokia_batch, rotation_list=[1, 2, 3])
+                if self.nokia_map:
+                    x_nokia_batch_rotated = self.get_rotations(x_nokia_batch, rotation_list=[1, 2, 3])
 
                 # Unite all of them
                 x_train_batch = np.concatenate((x_train_batch, x_batch_rotaed), axis=0)
                 y_train_batch = np.concatenate((y_train_batch, y_batch_rotated), axis=0)
-                x_nokia_batch = np.concatenate((x_nokia_batch, x_nokia_batch_rotated), axis=0)
+                if self.nokia_map:
+                    x_nokia_batch = np.concatenate((x_nokia_batch, x_nokia_batch_rotated), axis=0)
 
                 # Append Nokia map polygons to NN
-                x_train_batch = np.concatenate((x_train_batch, x_nokia_batch), axis=-1)
+                if self.nokia_map:
+                    x_train_batch = np.concatenate((x_train_batch, x_nokia_batch), axis=-1)
 
                 # random.permutation
-                del x_batch_rotaed, y_batch_rotated, x_nokia_batch_rotated, x_nokia_batch
+                del x_batch_rotaed, y_batch_rotated
+                if self.nokia_map:
+                    del x_nokia_batch_rotated, x_nokia_batch
 
                 p = np.random.permutation(len(x_train_batch))
                 x_train_batch = x_train_batch[p]
                 y_train_batch = y_train_batch[p]
 
                 # x_train_batch = x_train_batch[:, :, :, 3].reshape(x_train_batch.shape[:-1] + (1, )) # !!!!!!!!!!
-                x_train_batch = x_train_batch[:, :, :, :3] #.reshape(x_train_batch[:, :, :, 3].shape + (1,))  # !!!!!!!!!!
+                # x_train_batch = x_train_batch[:, :, :, :3] #.reshape(x_train_batch[:, :, :, 3].shape + (1,))  # !!!!!!!!!!
                 # yeild
                 # iter_over_batch = iter(x_train_batch_new)
                 # list(islice(file_names_iter, self.load_one_time_images))

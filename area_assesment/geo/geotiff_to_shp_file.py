@@ -20,9 +20,9 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 parser = argparse.ArgumentParser(description='Creates ESRI shapefile from GeoTIFFs images with mask.')
-parser.add_argument('--src_dir', dest='src_dir', type=str, default='../../output_data/test_poly_ersi',
+parser.add_argument('--src_dir', dest='src_dir', type=str, default='../../output_data/Mecca',
                     help='source file or files mask')
-parser.add_argument('--dst_dir', dest='dst_dir', type=str, default='../../output_data/test_poly_ersi/shp/',
+parser.add_argument('--dst_dir', dest='dst_dir', type=str, default='../../output_data/Mecca/shp/',
                     help='destination shape file path')
 parser.add_argument('-v', '--verbose', dest='v', action='store_const',
                     const=True, default=False,
