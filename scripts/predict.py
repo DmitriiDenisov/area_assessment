@@ -69,7 +69,7 @@ for i, f_sat in enumerate(valid_sat_files):
     # del img_sat
 
     # GET PATCHES:
-    sat_patches_old = array2patches(img_sat_upscale, patch_size=nn_input_patch_size, step_size=step_size)
+    # sat_patches_old = array2patches(img_sat_upscale, patch_size=nn_input_patch_size, step_size=step_size)
     sat_patches = array2patches_new(img_sat_upscale, patch_size=nn_input_patch_size, step_size=step_size)
     del img_sat_upscale
     logging.debug('sat_patches.shape: {}'.format(sat_patches.shape))
