@@ -10,7 +10,8 @@ from area_assesment.io_operations.visualization import just_show_numpy_as_image,
 
 
 class DataGeneratorCustom:
-    def __init__(self, batch_size, train_dir, train_masks_dir, train_nokia_poly, step_size, patch_size, target_shape, nokia_map=False):
+    def __init__(self, batch_size, train_dir, train_masks_dir, train_nokia_poly, step_size, patch_size, target_channels,
+                 nokia_map=False):
         self.batch_size = batch_size
         self.step_size = step_size
         self.patch_size = patch_size
@@ -21,7 +22,7 @@ class DataGeneratorCustom:
         self.train_masks_dir = train_masks_dir
         self.files_names = [f for f in listdir(train_dir) if isfile(join(train_dir, f))]
         self.step_per_epoch = self.get_step_pe_epoch()
-        self.target_shape = target_shape
+        self.target_channels = target_channels
 
     def __iter__(self):
         while True:
@@ -45,7 +46,6 @@ class DataGeneratorCustom:
                 # y_train_batch = np.array([np.array(load_img(join(self.train_masks_dir, f[:-4] + '_MAP' + '.tif'), grayscale=True))
                 #                          / 255 for f in batch_train_file_names])
                 f_mask = f_mask.reshape((f_mask.shape + (1,)))
-
 
                 # Get pathces
                 # aug_x_batch = np.array([], dtype=np.int64).reshape((0, ) + (64, 64, 3))
@@ -91,13 +91,15 @@ class DataGeneratorCustom:
                 # yeild
                 # iter_over_batch = iter(x_train_batch_new)
                 # list(islice(file_names_iter, self.load_one_time_images))
-                if self.target_shape[-1] == 2:
+                if self.target_channels == 2:
                     y_train_batch = np.concatenate([y_train_batch, 1 - y_train_batch], axis=-1)
-                elif self.target_shape[-1] != 1:
+                elif self.target_channels != 1:
                     y_train_batch = y_train_batch.reshape(y_train_batch.shape[:-1])
 
                 for i in range(0, len(x_train_batch), self.batch_size):
-                    yield x_train_batch[i: i + self.batch_size] / 255, y_train_batch[i: i + self.batch_size]
+                    yield x_train_batch[i: i + self.batch_size].astype(np.float) / 255, y_train_batch[
+                                                                                        i: i + self.batch_size].astype(
+                        np.float)
 
     def get_mask_nokia_map(self, f_nokia):
         pixel1 = [238, 243, 245]
@@ -131,10 +133,11 @@ class DataGeneratorCustom:
 ##valid_file_names = np.random.permutation(file_names)[round(0.8 * len(file_names)):]
 
 if __name__ == '__main__':
+    # Just checking that wverything works:
     gen = DataGeneratorCustom(batch_size=2,
                               step_size=32,
-                              patch_size=(64, 64),
-                              target_shape=(64, 64, 2),
+                              patch_size=(256, 256),
+                              target_channels=2,
                               train_dir='../../data/train/sat',
                               train_masks_dir='../../data/train/map',
                               train_nokia_poly='../../data/train/nokia_map'
@@ -148,8 +151,8 @@ if __name__ == '__main__':
     while True:
         i = 0
         for a, b in gen:
-            just_show_numpy_as_image((a[0]*255).astype(np.uint8), type='RGB', name='trash/sat_im_{}.tif'.format(i))
-            just_show_numpy_as_image((b[0]*255), type='not_RGB', name='trash/map_im_{}.tif'.format(i))
+            just_show_numpy_as_image((a[0] * 255).astype(np.uint8), type='RGB', name='trash/sat_im_{}.tif'.format(i))
+            just_show_numpy_as_image((b[0] * 255), type='not_RGB', name='trash/map_im_{}.tif'.format(i))
             i += 1
             if i > 10:
                 1 / 0

@@ -1,6 +1,7 @@
 import os, sys
+
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(PROJECT_PATH) # чтобы из консольки можно было запускать
+sys.path.append(PROJECT_PATH)  # чтобы из консольки можно было запускать
 import logging
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
@@ -14,14 +15,17 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 # SETTINGS
-nn_input_patch_size = (64, 64)  # (1024, 1024)  # (1024, 1024)  # (64, 64)
-nn_output_patch_size = (64, 64)  # (128, 128)  # (256, 256) # (16, 16)
+nn_input_patch_size = (128, 128)  # (1024, 1024)  # (1024, 1024)  # (64, 64)
 step_size = 32  # 256  # 16
 
 epochs = 400
 batch_size = 4
 net_weights_load = None
-net_weights_load = '../weights/unet_mecca/new_model_w_epoch80_jaccard0.9150.hdf5'
+
+print('INPUT_PATCH_SIZE:', nn_input_patch_size)
+
+# net_weights_load = '../weights/unet_mecca/good_models/w_epoch32_jaccard0.9272.hdf5'
+# net_weights_load = '../weights/unet_mecca/new_model_w_epoch80_jaccard0.9150.hdf5'
 # net_weights_load = '../weights/unet/unet_adam_64x64_epoch01_jaccard0.9510_valjaccard0.9946.hdf5'
 # net_weights_load = '../weights/cnn_v7/sakaka_cnn_v7_jaccard0.2528_valjaccard0.0406.hdf5'
 # net_weights_load = '../weights/cnn_v7/w_epoch03_jaccard0.3890_valjaccard0.1482.hdf5'
@@ -38,7 +42,8 @@ val_nokia_poly = '../data/val/nokia_map'
 if not net_weights_load:
     # model = unet_old(64, 64, 4)
     # model.summary()
-    model = unet2((64, 64, 3))
+    # model = unet2((64, 64, 3))
+    model = unet_old(128, 128, 3)
     # model = uresnet(input_layer=)
     # model = unet(input_size=(64, 64, 1))
     # input_layer = Input((64, 64, 3))
@@ -46,8 +51,10 @@ if not net_weights_load:
     # model = Model(input_layer, output_layer)
     # model.compile(loss='binary_crossentropy', optimizer="adam", metrics=[dice_coef_K])
     # model = CreateModel_uresnet(img_size_target=64)
-    # model.compile(optimizer='adam', loss='binary_crossentropy',
+    # model.compile(optimizer='adam', loss=jaccard_distance,#'binary_crossentropy',
     #              metrics=[precision, recall, fmeasure, dice_coef_K, jaccard_coef])
+    # model.summary()
+    print('CREATING MODEL FROM SCRATCH...')
     model.summary()
 
 else:
@@ -63,7 +70,7 @@ else:
                        }
                        )
     model.summary()
-    model.compile(optimizer='adam', loss='binary_crossentropy',
+    model.compile(optimizer='adam', loss=jaccard_distance,  # 'binary_crossentropy'
                   metrics=[precision, recall, fmeasure, dice_coef_K, jaccard_coef])
 
 target_shape = model.output_shape
@@ -80,7 +87,7 @@ train_data_gen = DataGeneratorCustom(batch_size=batch_size,
                                      train_nokia_poly=train_nokia_poly,
                                      patch_size=nn_input_patch_size,
                                      step_size=step_size,
-                                     target_shape=target_shape,
+                                     target_channels=target_shape[-1] if len(target_shape) == 4 else -1,
                                      nokia_map=False)
 step_per_epoch = train_data_gen.step_per_epoch // batch_size
 train_data_gen = iter(train_data_gen)
@@ -90,7 +97,7 @@ val_data_gen = DataGeneratorCustom(batch_size=batch_size,
                                    train_nokia_poly=val_nokia_poly,
                                    patch_size=nn_input_patch_size,
                                    step_size=step_size,
-                                   target_shape=target_shape,
+                                   target_channels=target_shape[-1] if len(target_shape) == 4 else -1,
                                    nokia_map=False)
 step_per_val = val_data_gen.step_per_epoch // batch_size
 val_data_gen = iter(val_data_gen)
@@ -100,7 +107,8 @@ logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weight
 
 tb_callback = TensorBoardBatchLogger(project_path='../', log_every=4)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                                          'retrained_10sept_w_epoch{epoch:02d}_jaccard{jaccard_coef:.4f}.hdf5'), #valjaccard{val_jaccard_coef:.4f}
+                                          'w_no_lambda_epoch{epoch:02d}_jaccard{jaccard_coef:.3f}_dice_coef_K{dice_coef_K:.3f}_fmeasure{fmeasure:.3f}.hdf5'),
+                             # valjaccard{val_jaccard_coef:.4f}
                              monitor='jaccard_coef', save_best_only=True)
 
 model.fit_generator(

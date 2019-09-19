@@ -1,4 +1,5 @@
 from keras import backend as K
+import tensorflow as tf
 
 
 def jaccard_coef(y_true, y_pred):
@@ -16,6 +17,20 @@ def dice_coef_K(y_true, y_pred, smooth=1):
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
     return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
+
+def dice_coef(y_true, y_pred, smooth=1):
+    """
+    Dice = (2*|X & Y|)/ (|X|+ |Y|)
+         =  2*sum(|A*B|)/(sum(A^2)+sum(B^2))
+    ref: https://arxiv.org/pdf/1606.04797v1.pdf
+    """
+    intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
+    return (2. * intersection + smooth) / (K.sum(K.square(y_true), -1) + K.sum(K.square(y_pred), -1) + smooth)
+
+
+def dice_coef_loss(y_true, y_pred):
+    return 1 - dice_coef(y_true, y_pred)
 
 
 def precision(y_true, y_pred):
@@ -81,3 +96,19 @@ def fmeasure(y_true, y_pred):
     Here it is only computed as a batch-wise average, not globally.
     """
     return fbeta_score(y_true, y_pred, beta=1)
+
+
+def jaccard_distance(y_true, y_pred, smooth=100):
+    intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
+    sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
+    jac = (intersection + smooth) / (sum_ - intersection + smooth)
+    return (1 - jac) * smooth
+
+
+def jaccard_distance_tf(y_true, y_pred, smooth=100):
+    """ Calculates mean of Jaccard distance as a loss function """
+    intersection = tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+    sum_ = tf.reduce_sum(y_true + y_pred, axis=(1, 2))
+    jac = (intersection + smooth) / (sum_ - intersection + smooth)
+    jd = (1 - jac) * smooth
+    return tf.reduce_mean(jd)

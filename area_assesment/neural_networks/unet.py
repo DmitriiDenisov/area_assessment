@@ -41,9 +41,9 @@ def unet_old(patch_height, patch_width, n_ch):
 
     conv8 = Lambda(lambda x: x[:, :, :, 0])(conv7)
 
-    model = Model(input=inputs, output=conv8)
+    model = Model(input=inputs, output=conv7)# conv8
     # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
-    model.compile(optimizer='adam', loss='binary_crossentropy',
+    model.compile(optimizer='adam', loss='binary_crossentropy',#'binary_crossentropy', dice_coef_loss
                   metrics=['binary_crossentropy', precision,  # 'binary_accuracy'
                            recall, fmeasure, dice_coef_K, jaccard_coef])
     return model
@@ -234,8 +234,8 @@ def unet2(inputs):
     outputs = Conv2D(1, (1, 1), activation='sigmoid')(c9)
 
     model = Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer='adam', loss='binary_crossentropy',
-                  metrics=['binary_crossentropy', precision,  # 'binary_accuracy'
+    model.compile(optimizer='adam', loss=jaccard_distance_tf,#'binary_crossentropy',
+                  metrics=[precision,  # 'binary_accuracy'
                            recall, fmeasure, dice_coef_K, jaccard_coef])
     return model
 
