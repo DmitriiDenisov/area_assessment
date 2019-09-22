@@ -30,20 +30,20 @@ class DataGeneratorCustom:
             # batch_train_file_names = list(islice(file_names_iter, self.load_one_time_images))
             for f in file_names:
                 # print(batch_train_file_names)
-                f_image = np.array(load_img(join(self.train_dir, f), grayscale=False))
+                f_image = np.array(load_img(join(self.train_dir, f), color_mode='rgb'))
                 # f_image = f_image / 255
-                f_mask = np.array(load_img(join(self.train_masks_dir, '{}_MAP.tif'.format(f[:-4])), grayscale=True))
+                f_mask = np.array(load_img(join(self.train_masks_dir, '{}_MAP.tif'.format(f[:-4])), color_mode='grayscale'))
                 f_mask = (f_mask / 255).astype(np.uint8)
                 if self.nokia_map:
                     f_nokia = np.array(
-                        load_img(join(self.train_nokia_poly, '{}_NOKIA.tif'.format(f[:-4])), grayscale=False))
-                    f_nokia = self.get_mask_nokia_map(f_nokia)
-                    f_nokia = (f_nokia / 255).astype(np.uint8)
+                        load_img(join(self.train_nokia_poly, '{}_NOKIA.tif'.format(f[:-4])), color_mode='grayscale'))
+                    # f_nokia = self.get_mask_nokia_map(f_nokia) # already done on
+                    f_nokia = (f_nokia / 255).astype(np.uint8) # !!!!!!!!
                     f_nokia = f_nokia.reshape((f_nokia.shape + (1,)))
-                # x_train_batch = np.array([np.array(load_img(join(self.train_dir, f), grayscale=False))
+                # x_train_batch = np.array([np.array(load_img(join(self.train_dir, f), color_mode='rgb'))
                 #                          / 255 for f in batch_train_file_names])
                 # name_map = f[:-4] + '_MAP' + '.tif'
-                # y_train_batch = np.array([np.array(load_img(join(self.train_masks_dir, f[:-4] + '_MAP' + '.tif'), grayscale=True))
+                # y_train_batch = np.array([np.array(load_img(join(self.train_masks_dir, f[:-4] + '_MAP' + '.tif'), color_mode='grayscale'))
                 #                          / 255 for f in batch_train_file_names])
                 f_mask = f_mask.reshape((f_mask.shape + (1,)))
 
@@ -74,17 +74,19 @@ class DataGeneratorCustom:
                     x_nokia_batch = np.concatenate((x_nokia_batch, x_nokia_batch_rotated), axis=0)
 
                 # Append Nokia map polygons to NN
-                if self.nokia_map:
-                    x_train_batch = np.concatenate((x_train_batch, x_nokia_batch), axis=-1)
+                # if self.nokia_map:
+                    # x_train_batch = np.concatenate((x_train_batch, x_nokia_batch), axis=-1)
 
                 # random.permutation
                 del x_batch_rotaed, y_batch_rotated
                 if self.nokia_map:
-                    del x_nokia_batch_rotated, x_nokia_batch
+                    del x_nokia_batch_rotated
 
                 p = np.random.permutation(len(x_train_batch))
                 x_train_batch = x_train_batch[p]
                 y_train_batch = y_train_batch[p]
+                if self.nokia_map:
+                    x_nokia_batch = x_nokia_batch[p]
 
                 # x_train_batch = x_train_batch[:, :, :, 3].reshape(x_train_batch.shape[:-1] + (1, )) # !!!!!!!!!!
                 # x_train_batch = x_train_batch[:, :, :, :3] #.reshape(x_train_batch[:, :, :, 3].shape + (1,))  # !!!!!!!!!!
@@ -97,14 +99,12 @@ class DataGeneratorCustom:
                     y_train_batch = y_train_batch.reshape(y_train_batch.shape[:-1])
 
                 for i in range(0, len(x_train_batch), self.batch_size):
-                    yield x_train_batch[i: i + self.batch_size].astype(np.float) / 255, y_train_batch[
-                                                                                        i: i + self.batch_size].astype(
-                        np.float)
-
-    def get_mask_nokia_map(self, f_nokia):
-        pixel1 = [238, 243, 245]
-        mask = (f_nokia[:, :, ] == pixel1).all(axis=-1).astype(np.uint8)
-        return mask * 255
+                    if self.nokia_map:
+                        yield [x_train_batch[i: i + self.batch_size].astype(np.float) / 255, x_nokia_batch[i: i + self.batch_size].astype(np.float)], y_train_batch[i: i + self.batch_size].astype(np.float)
+                    else:
+                        yield x_train_batch[i: i + self.batch_size].astype(np.float) / 255, y_train_batch[
+                                                                                            i: i + self.batch_size].astype(
+                            np.float)
 
     def get_rotations(self, batch, rotation_list):
         target_shape_x = list(batch.shape)
@@ -118,7 +118,7 @@ class DataGeneratorCustom:
     def get_step_pe_epoch(self):
         total = 0
         for f in self.files_names:
-            temp_img = np.array(load_img(join(self.train_dir, f), grayscale=False))
+            temp_img = np.array(load_img(join(self.train_dir, f), color_mode='rgb'))
             num_cols = (temp_img.shape[1] - self.patch_size[1]) // self.step_size
             num_rows = (temp_img.shape[0] - self.patch_size[0]) // self.step_size
             temp = (num_cols + 1) * (num_rows + 1)
@@ -134,13 +134,15 @@ class DataGeneratorCustom:
 
 if __name__ == '__main__':
     # Just checking that wverything works:
-    gen = DataGeneratorCustom(batch_size=2,
-                              step_size=32,
-                              patch_size=(256, 256),
-                              target_channels=2,
+    patch_size = (256, 256)
+    gen = DataGeneratorCustom(batch_size=4,
+                              step_size=64,
+                              patch_size=patch_size,
+                              target_channels=1,
                               train_dir='../../data/train/sat',
                               train_masks_dir='../../data/train/map',
-                              train_nokia_poly='../../data/train/nokia_map'
+                              train_nokia_poly='../../data/train/nokia_mask',
+                              nokia_map=True
                               )
     i = 0
 
@@ -150,9 +152,10 @@ if __name__ == '__main__':
 
     while True:
         i = 0
-        for a, b in gen:
+        for ([a, b], c) in gen:
             just_show_numpy_as_image((a[0] * 255).astype(np.uint8), type='RGB', name='trash/sat_im_{}.tif'.format(i))
-            just_show_numpy_as_image((b[0] * 255), type='not_RGB', name='trash/map_im_{}.tif'.format(i))
+            just_show_numpy_as_image((b[0] * 255).reshape(patch_size), type='not_RGB', name='trash/nokia_map_im_{}.tif'.format(i))
+            just_show_numpy_as_image((c[0] * 255).reshape(patch_size), type='not_RGB', name='trash/map_im_{}.tif'.format(i))
             i += 1
             if i > 10:
                 1 / 0

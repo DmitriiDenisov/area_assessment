@@ -1,7 +1,7 @@
 import os
 import tensorflow as tf
 from time import time
-from keras.callbacks import TensorBoard, Callback
+from tensorflow.keras.callbacks import TensorBoard, Callback
 from datetime import datetime
 import time
 

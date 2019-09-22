@@ -1,39 +1,39 @@
-from keras.engine import Model
-from keras.layers import *
-from keras.optimizers import SGD, Adam
+from tensorflow.keras import Model
+from tensorflow.keras.layers import *
+from tensorflow.keras.optimizers import SGD, Adam
 from area_assesment.neural_networks.metrics import *
-from keras.layers import Input, Dropout, BatchNormalization, Activation, Add
+from tensorflow.keras.layers import Input, Dropout, BatchNormalization, Activation, Add
 
 ACTIVATION = "relu"
 
 
 def unet_old(patch_height, patch_width, n_ch):
     inputs = Input((patch_height, patch_width, n_ch))
-    conv1 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(inputs)
+    conv1 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(inputs)
     conv1 = Dropout(0.2)(conv1)
-    conv1 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(conv1)
+    conv1 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
 
-    conv2 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(pool1)
+    conv2 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(pool1)
     conv2 = Dropout(0.2)(conv2)
-    conv2 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(conv2)
+    conv2 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(conv2)
     pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
 
-    conv3 = Convolution2D(128, 3, 3, activation='relu', border_mode='same')(pool2)
+    conv3 = Conv2D(128, kernel_size=3, activation='relu', padding='same')(pool2)
     conv3 = Dropout(0.2)(conv3)
-    conv3 = Convolution2D(128, 3, 3, activation='relu', border_mode='same')(conv3)
+    conv3 = Conv2D(128, kernel_size=3, activation='relu', padding='same')(conv3)
 
     up1 = Concatenate(axis=3)([UpSampling2D(size=(2, 2))(conv3), conv2])
-    conv4 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(up1)
+    conv4 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(up1)
     conv4 = Dropout(0.2)(conv4)
-    conv4 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(conv4)
+    conv4 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(conv4)
 
     up2 = Concatenate(axis=3)([UpSampling2D(size=(2, 2))(conv4), conv1])
-    conv5 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(up2)
+    conv5 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(up2)
     conv5 = Dropout(0.2)(conv5)
-    conv5 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(conv5)
+    conv5 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(conv5)
 
-    conv6 = Convolution2D(2, 1, 1, activation='relu', border_mode='same')(conv5)
+    conv6 = Conv2D(2, kernel_size=1, activation='relu', padding='same')(conv5)
     conv6 = core.Reshape((patch_height * patch_width, 2))(conv6)
 
     conv7 = core.Activation('softmax')(conv6)
@@ -41,9 +41,9 @@ def unet_old(patch_height, patch_width, n_ch):
 
     conv8 = Lambda(lambda x: x[:, :, :, 0])(conv7)
 
-    model = Model(input=inputs, output=conv7)# conv8
+    model = Model(input=inputs, output=conv7)  # conv8
     # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
-    model.compile(optimizer='adam', loss='binary_crossentropy',#'binary_crossentropy', dice_coef_loss
+    model.compile(optimizer='adam', loss='binary_crossentropy',  # 'binary_crossentropy', dice_coef_loss
                   metrics=['binary_crossentropy', precision,  # 'binary_accuracy'
                            recall, fmeasure, dice_coef_K, jaccard_coef])
     return model
@@ -234,7 +234,7 @@ def unet2(inputs):
     outputs = Conv2D(1, (1, 1), activation='sigmoid')(c9)
 
     model = Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer='adam', loss=jaccard_distance_tf,#'binary_crossentropy',
+    model.compile(optimizer='adam', loss=jaccard_distance_tf,  # 'binary_crossentropy',
                   metrics=[precision,  # 'binary_accuracy'
                            recall, fmeasure, dice_coef_K, jaccard_coef])
     return model
@@ -418,3 +418,57 @@ def CreateModel_uresnet(img_size_target, channels=3):
 
 
 # CreateModel(img_size_target=64)
+
+def unet_2_inputs(patch_height, patch_width, n_ch):
+    inputs = Input((patch_height, patch_width, n_ch))
+    conv1 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(inputs)
+    conv1 = Dropout(0.2)(conv1)
+    conv1 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(conv1)
+    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
+
+    conv2 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(pool1)
+    conv2 = Dropout(0.2)(conv2)
+    conv2 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(conv2)
+    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
+
+    conv3 = Conv2D(128, kernel_size=3, activation='relu', padding='same')(pool2)
+    conv3 = Dropout(0.2)(conv3)
+    conv3 = Conv2D(128, kernel_size=3, activation='relu', padding='same')(conv3)
+
+    up1 = Concatenate(axis=3)([UpSampling2D(size=(2, 2))(conv3), conv2])
+    conv4 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(up1)
+    conv4 = Dropout(0.2)(conv4)
+    conv4 = Conv2D(64, kernel_size=3, activation='relu', padding='same')(conv4)
+
+    up2 = Concatenate(axis=3)([UpSampling2D(size=(2, 2))(conv4), conv1])
+    conv5 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(up2)
+    conv5 = Dropout(0.2)(conv5)
+    conv5 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(conv5)
+
+    conv6 = Conv2D(2, kernel_size=1, activation='relu', padding='same')(conv5)
+    conv6 = core.Reshape((patch_height * patch_width, 2))(conv6)
+
+    conv7 = core.Activation('softmax')(conv6)
+    conv7 = core.Reshape((patch_height, patch_width, 2))(conv7)
+
+    conv8 = Lambda(lambda x: x[:, :, :, 0])(conv7)
+    reshape_conv8 = Reshape((patch_height, patch_width, 1))(conv8)
+    # flatten_output_1 = Flatten()(conv8)
+
+    inout_nokia = Input((patch_height, patch_width, 1))
+    # flatten_nokia = Flatten()(inout_nokia)
+
+    concat_outputs = Concatenate(axis=3)([reshape_conv8, inout_nokia])
+
+    conv_meta = Conv2D(1, kernel_size=4, padding='same', activation='relu')(concat_outputs) # relu
+    conv_meta_2 = Conv2D(1, kernel_size=4, padding='same', activation='sigmoid')(conv_meta)
+    # dense_1 = Dense(128 * 128, activation='relu')(concat_outputs)
+    # dense_2 = Dense(128 * 128, activation='sigmoid')(dense_1)
+    # ans = Reshape((patch_height, patch_width))(dense_2)
+
+    model = Model(inputs=[inputs, inout_nokia], outputs=conv_meta_2)  # conv8
+    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
+    model.compile(optimizer='adam', loss='binary_crossentropy',  # 'binary_crossentropy', dice_coef_loss
+                  metrics=[precision,  # 'binary_accuracy'
+                           recall, fmeasure, dice_coef_K, jaccard_coef])
+    return model

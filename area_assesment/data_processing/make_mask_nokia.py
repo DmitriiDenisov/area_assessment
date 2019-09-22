@@ -21,5 +21,5 @@ for f in list_of_files:
     f_nokia = np.array(load_img(join(source_dir, f), grayscale=False))
     mask = get_mask_nokia_map(f_nokia)
     im = Image.fromarray(mask)
-    path_ = os.path.join(target_dir, "{}_MASK.tif".format(f[:-4]))
+    path_ = os.path.join(target_dir, "{}_NOKIA.tif".format(f[:-4]))
     im.save(path_)

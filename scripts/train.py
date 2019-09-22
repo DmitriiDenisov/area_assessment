@@ -1,18 +1,28 @@
 import os, sys
+import numpy as np
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+from area_assesment.io_operations.check_gpus import get_available_gpus
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(PROJECT_PATH)  # чтобы из консольки можно было запускать
 import logging
-from keras.callbacks import ModelCheckpoint
-from keras.models import load_model
+from area_assesment.neural_networks.metrics import *
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
 from area_assesment.neural_networks.DataGeneratorCustom import DataGeneratorCustom
 from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.neural_networks.cnn import *
+# from area_assesment.legacy.cnn import *
 from area_assesment.neural_networks.logger import TensorBoardBatchLogger
-from area_assesment.neural_networks.unet import unet, uresnet, unet2, unet_old, CreateModel_uresnet
+from area_assesment.neural_networks.unet import unet_2_inputs
 
-logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.ERROR,
+logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname) -8s %(message)s', level=logging.INFO,
                     handlers=[logging.StreamHandler()])
+
+# GET INFO ABOUT GPU
+print('TEST AVAILABILITY OF GPU:', get_available_gpus())
 
 # SETTINGS
 nn_input_patch_size = (128, 128)  # (1024, 1024)  # (1024, 1024)  # (64, 64)
@@ -24,18 +34,19 @@ net_weights_load = None
 
 print('INPUT_PATCH_SIZE:', nn_input_patch_size)
 
+# net_weights_load = None
 # net_weights_load = '../weights/unet_mecca/good_models/w_epoch32_jaccard0.9272.hdf5'
-# net_weights_load = '../weights/unet_mecca/new_model_w_epoch80_jaccard0.9150.hdf5'
+net_weights_load = '../weights/unet_mecca/try_128x128_unet_old_with_lambda_layer/w_epoch48_jaccard0.889_dice_coef_K0.941_fmeasure0.958.hdf5'
 # net_weights_load = '../weights/unet/unet_adam_64x64_epoch01_jaccard0.9510_valjaccard0.9946.hdf5'
 # net_weights_load = '../weights/cnn_v7/sakaka_cnn_v7_jaccard0.2528_valjaccard0.0406.hdf5'
 # net_weights_load = '../weights/cnn_v7/w_epoch03_jaccard0.3890_valjaccard0.1482.hdf5'
 net_weights_dir_save = os.path.normpath('../weights/unet_mecca')
 train_dir = '../data/train/sat'
 train_masks_dir = '../data/train/map'
-train_nokia_poly = '../data/train/nokia_map'
+train_nokia_poly = '../data/train/nokia_mask'
 val_dir = '../data/val/sat'
 val_masks_dir = '../data/val/map'
-val_nokia_poly = '../data/val/nokia_map'
+val_nokia_poly = '../data/val/nokia_mask'
 
 # MODEL DEFINITION
 
@@ -43,7 +54,8 @@ if not net_weights_load:
     # model = unet_old(64, 64, 4)
     # model.summary()
     # model = unet2((64, 64, 3))
-    model = unet_old(128, 128, 3)
+    model = unet_2_inputs(128, 128, 3)
+    # model = unet_old(128, 128, 3)
     # model = uresnet(input_layer=)
     # model = unet(input_size=(64, 64, 1))
     # input_layer = Input((64, 64, 3))
@@ -56,7 +68,6 @@ if not net_weights_load:
     # model.summary()
     print('CREATING MODEL FROM SCRATCH...')
     model.summary()
-
 else:
     # LOADING PREVIOUS WEIGHTS OF MODEL
     logging.info('LOADING PREVIOUS WEIGHTS OF MODEL: {}'.format(net_weights_load))
@@ -107,7 +118,7 @@ logging.info('FIT MODEL, EPOCHS: {}, SAVE WEIGHTS: {}'.format(epochs, net_weight
 
 tb_callback = TensorBoardBatchLogger(project_path='../', log_every=4)
 checkpoint = ModelCheckpoint(os.path.join(net_weights_dir_save,
-                                          'w_no_lambda_epoch{epoch:02d}_jaccard{jaccard_coef:.3f}_dice_coef_K{dice_coef_K:.3f}_fmeasure{fmeasure:.3f}.hdf5'),
+                                          'two_inputs_epoch{epoch:02d}_jaccard{jaccard_coef:.3f}_dice_coef_K{dice_coef_K:.3f}_fmeasure{fmeasure:.3f}.hdf5'),
                              # valjaccard{val_jaccard_coef:.4f}
                              monitor='jaccard_coef', save_best_only=True)
 

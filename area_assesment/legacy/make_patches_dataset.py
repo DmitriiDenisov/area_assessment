@@ -1,15 +1,11 @@
-from os.path import join
 import cv2
 import os
 from PIL import Image
-import numpy as np
 from os import listdir
 from os.path import isfile, join
 import logging
-from area_assesment.io_operations.data_io import filenames_in_dir
-from area_assesment.images_processing.patching import array2patches, rotateImage, array2patches_new
-from area_assesment.io_operations.visualization import plot2
-from area_assesment.neural_networks.cnn import *
+from area_assesment.images_processing.patching import array2patches_new
+from area_assesment.legacy.cnn import *
 from keras_preprocessing.image import load_img
 
 
