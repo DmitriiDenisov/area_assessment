@@ -34,9 +34,14 @@ def convert_coords_norm(dict_new_polygons, geo_transform):
     return dict_norm_polygons
 
 
+def f(lon_lat):
+    return list(transform(P4326, P3857, lon_lat[0], lon_lat[1]))
+
+
 source_dir = '../../data/train/sat'
 target_dir = '../../data/train/map'
 geojson_path = "../../data/train/NN_predict_0_geojson_1.geojson"
+presumable_path_dict = "../../data/train/dict_new_polygons.json"
 print(geojson_path)
 
 P3857 = Proj(init='epsg:3857')
@@ -47,33 +52,33 @@ guestData = guestFile.read()
 guestFile.close()
 gdfJson = json.loads(guestData)
 
-
-def f(lon_lat):
-    return list(transform(P4326, P3857, lon_lat[0], lon_lat[1]))
-
-
 # Перевести координаты long/lat в EPSG:3857
 dict_new_polygons = {}
-for poly_dict in tqdm(gdfJson['features']):
-    if len(poly_dict['geometry']['coordinates'][0]) == 1:
-        list_coords = poly_dict['geometry']['coordinates'][0][0]
-    else:
-        list_coords = poly_dict['geometry']['coordinates'][0]
-    id = poly_dict['id']
-    converted_coords = []
 
-    # converted_coords = [list(transform(P4326, P3857, lon, lat)) for (lon, lat) in list_coords]
-    # converted_coords = np.array(list(map(f, list_coords)))
-    converted_coords = np.apply_along_axis(f, 1, list_coords).tolist()
+if os.path.isfile(presumable_path_dict):
+    with open(presumable_path_dict) as json_file:
+        dict_new_polygons = json.load(json_file)
+else:
+    for poly_dict in tqdm(gdfJson['features']):
+        if len(poly_dict['geometry']['coordinates'][0]) == 1:
+            list_coords = poly_dict['geometry']['coordinates'][0][0]
+        else:
+            list_coords = poly_dict['geometry']['coordinates'][0]
+        id = poly_dict['id']
+        converted_coords = []
 
-    # for (lon, lat) in list_coords:
-    #    x, y = transform(P4326, P3857, lon, lat)
-    #    converted_coords.append([x, y])
-    dict_new_polygons[id] = converted_coords[:]
+        # converted_coords = [list(transform(P4326, P3857, lon, lat)) for (lon, lat) in list_coords]
+        # converted_coords = np.array(list(map(f, list_coords)))
+        converted_coords = np.apply_along_axis(f, 1, list_coords).tolist()
 
-# Save new json
-with open('../../data/train/dict_new_polygons.json', 'w') as fp:
-    json.dump(dict_new_polygons, fp)
+        # for (lon, lat) in list_coords:
+        #    x, y = transform(P4326, P3857, lon, lat)
+        #    converted_coords.append([x, y])
+        dict_new_polygons[id] = converted_coords[:]
+
+    # Save new json
+    with open('../../data/train/dict_new_polygons.json', 'w') as fp:
+        json.dump(dict_new_polygons, fp)
 
 list_of_files = [f for f in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, f)) and f[-4:] == '.tif']
 print('Total number of files: {}'.format(len(list_of_files)))

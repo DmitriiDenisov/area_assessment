@@ -142,7 +142,7 @@ if __name__ == '__main__':
                               train_dir='../../data/train/sat',
                               train_masks_dir='../../data/train/map',
                               train_nokia_poly='../../data/train/nokia_mask',
-                              nokia_map=True
+                              nokia_map=False
                               )
     i = 0
 
@@ -152,9 +152,9 @@ if __name__ == '__main__':
 
     while True:
         i = 0
-        for ([a, b], c) in gen:
+        for (a, c) in gen:
             just_show_numpy_as_image((a[0] * 255).astype(np.uint8), type='RGB', name='trash/sat_im_{}.tif'.format(i))
-            just_show_numpy_as_image((b[0] * 255).reshape(patch_size), type='not_RGB', name='trash/nokia_map_im_{}.tif'.format(i))
+            # just_show_numpy_as_image((b[0] * 255).reshape(patch_size), type='not_RGB', name='trash/nokia_map_im_{}.tif'.format(i))
             just_show_numpy_as_image((c[0] * 255).reshape(patch_size), type='not_RGB', name='trash/map_im_{}.tif'.format(i))
             i += 1
             if i > 10:

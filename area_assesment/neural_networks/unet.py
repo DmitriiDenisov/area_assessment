@@ -2,7 +2,6 @@ from tensorflow.keras import Model
 from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import SGD, Adam
 from area_assesment.neural_networks.metrics import *
-from tensorflow.keras.layers import Input, Dropout, BatchNormalization, Activation, Add
 
 ACTIVATION = "relu"
 
@@ -34,14 +33,14 @@ def unet_old(patch_height, patch_width, n_ch):
     conv5 = Conv2D(32, kernel_size=3, activation='relu', padding='same')(conv5)
 
     conv6 = Conv2D(2, kernel_size=1, activation='relu', padding='same')(conv5)
-    conv6 = core.Reshape((patch_height * patch_width, 2))(conv6)
+    conv6 = Reshape((patch_height * patch_width, 2))(conv6)
 
-    conv7 = core.Activation('softmax')(conv6)
-    conv7 = core.Reshape((patch_height, patch_width, 2))(conv7)
+    conv7 = Activation('softmax')(conv6)
+    conv7 = Reshape((patch_height, patch_width, 2))(conv7)
 
     conv8 = Lambda(lambda x: x[:, :, :, 0])(conv7)
 
-    model = Model(input=inputs, output=conv7)  # conv8
+    model = Model(inputs=inputs, outputs=conv8)  # conv8
     # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.3, nesterov=False)
     model.compile(optimizer='adam', loss='binary_crossentropy',  # 'binary_crossentropy', dice_coef_loss
                   metrics=['binary_crossentropy', precision,  # 'binary_accuracy'
