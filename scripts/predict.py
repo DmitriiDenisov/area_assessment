@@ -6,21 +6,23 @@ import numpy as np
 
 from keras_preprocessing.image import load_img
 
+from area_assesment.geo.geotiff_utils import write_geotiff
+# from area_assesment.geo.utils import write_geotiff
 from area_assesment.images_processing.patching import array2patches_new, patches2array_overlap_norm
 from area_assesment.io_operations.data_io import filenames_in_dir
 from area_assesment.io_operations.visualization import save_mask_and_im_overlayer, \
     just_show_numpy_as_image
-from area_assesment.legacy.cnn import *
 
-from keras.models import load_model
-from area_assesment.neural_networks.metrics import fmeasure, precision, recall, jaccard_coef
+from tensorflow.keras.models import load_model
+from area_assesment.neural_networks.metrics import fmeasure, precision, recall, jaccard_coef, dice_coef_K
 
 logging.getLogger().setLevel(logging.INFO)
 
+MODEL_PATH = '../weights/unet_mecca/z18_model/z18_epoch166_jaccard0.885_dice_coef_K0.939_fmeasure0.958.hdf5'
 # MODEL_PATH = '../weights/unet/buildings-unet_64x64x3_epoch712_iu0.9133_val_iu0.9472.hdf5'
 # MODEL_PATH = '../weights/unet_mecca/good_models/retrained_10sept_w_epoch01_jaccard0.9152.hdf5'
 # MODEL_PATH = '../weights/unet_mecca/try_128x128_unet_old_with_lambda_layer/w_epoch45_jaccard0.889_dice_coef_K0.941_fmeasure0.959.hdf5'
-MODEL_PATH = '../weights/unet_mecca/try_128x128_unet_old_without_lambda_layer/w_no_lambda_epoch147_jaccard0.942_dice_coef_K0.970_fmeasure0.979.hdf5'
+# MODEL_PATH = '../weights/unet_mecca/try_128x128_unet_old_without_lambda_layer/w_no_lambda_epoch147_jaccard0.942_dice_coef_K0.970_fmeasure0.979.hdf5'
 # MODEL_PATH = '../weights/unet_mecca/two_inputs_epoch25_jaccard0.421_dice_coef_K0.598_fmeasure0.726.hdf5'
 print('Loading model from {}'.format(MODEL_PATH))
 model = load_model(MODEL_PATH,
@@ -44,7 +46,7 @@ else:
 
 # dir_test = os.path.normpath('../sakaka_data/buildings/valid/sat/')  # '../../data/mass_buildings/valid/'
 dir_nokia = os.path.normpath('../data/val/nokia_mask')
-dir_test = os.path.normpath('../data/val/sat_2')  # '../../data/mass_buildings/valid/'
+dir_test = os.path.normpath('../data/val/sat_2/z18')  # '../../data/mass_buildings/valid/'
 files_names = sorted([f for f in os.listdir(dir_test) if isfile(join(dir_test, f))])
 # dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
 # output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_128x128_epoch446_subpatch64_stepsize64/')
@@ -134,6 +136,6 @@ for i, f_sat in enumerate(files_names):  # valid_sat_files
         # 1 / 0
 
     # WRITE GEOTIFF
-    # geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(os.path.basename(f_sat)[:-4]))
-    # write_geotiff(geotiff_output_path, raster_layers=(map_pred * 255).astype(np.int16), gdal_ds=f_sat)
+    geotiff_output_path = os.path.join(output_folder, '{}_HEATMAP.tif'.format(os.path.basename(f_sat)[:-4]))
+    write_geotiff(geotiff_output_path, raster_layers=(map_pred * 255).astype(np.int16), gdal_ds=join(dir_test, f_sat))
     del map_pred

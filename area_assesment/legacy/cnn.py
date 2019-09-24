@@ -1,7 +1,5 @@
-from keras.engine import Model
-from keras.models import Sequential
-from keras.layers import *
-from keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import *
 
 from area_assesment.neural_networks.metrics import *
 
