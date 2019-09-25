@@ -20,9 +20,9 @@ logging.basicConfig(format='%(filename)s:%(lineno)s - %(asctime)s - %(levelname)
                     handlers=[logging.StreamHandler()])
 
 parser = argparse.ArgumentParser(description='Creates ESRI shapefile from GeoTIFFs images with mask.')
-parser.add_argument('--src_dir', dest='src_dir', type=str, default='../../output_data/Mecca_old_model',
+parser.add_argument('--src_dir', dest='src_dir', type=str, default='../../output_data/Mecca',
                     help='source file or files mask')
-parser.add_argument('--dst_dir', dest='dst_dir', type=str, default='../../output_data/Mecca_old_model/shp/',
+parser.add_argument('--dst_dir', dest='dst_dir', type=str, default='../../output_data/Mecca/shp/',
                     help='destination shape file path')
 parser.add_argument('-v', '--verbose', dest='v', action='store_const',
                     const=True, default=False,
@@ -148,7 +148,7 @@ for i, p in enumerate(mult_p):
     layer_c.CreateFeature(feature_c)
     layer_gjc.CreateFeature(feature_gjc)
 
-    #release features according to the docs
+    # release features according to the docs
     feature_gjc = None
     feature_c = None
     feature = None

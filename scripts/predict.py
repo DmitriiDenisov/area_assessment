@@ -18,7 +18,8 @@ from area_assesment.neural_networks.metrics import fmeasure, precision, recall, 
 
 logging.getLogger().setLevel(logging.INFO)
 
-MODEL_PATH = '../weights/unet_mecca/z18_model/z18_epoch166_jaccard0.885_dice_coef_K0.939_fmeasure0.958.hdf5'
+# MODEL_PATH = '../weights/unet_mecca/z18_model/z18_epoch166_jaccard0.885_dice_coef_K0.939_fmeasure0.958.hdf5'
+MODEL_PATH = '../weights/unet_mecca/z18_model/z18_epoch306_jaccard0.891_dice_coef_K0.942_fmeasure0.960.hdf5'
 # MODEL_PATH = '../weights/unet/buildings-unet_64x64x3_epoch712_iu0.9133_val_iu0.9472.hdf5'
 # MODEL_PATH = '../weights/unet_mecca/good_models/retrained_10sept_w_epoch01_jaccard0.9152.hdf5'
 # MODEL_PATH = '../weights/unet_mecca/try_128x128_unet_old_with_lambda_layer/w_epoch45_jaccard0.889_dice_coef_K0.941_fmeasure0.959.hdf5'
@@ -37,8 +38,8 @@ model = load_model(MODEL_PATH,
 model.summary()
 
 # PATCHING SETTINGS buildings
-nn_input_patch_size = model.output_shape[1:3]
-step_size = 64
+nn_input_patch_size = model.output_shape[1:3]  # type: tuple
+step_size = 64  # type: int
 if len(model.input_shape) == 2:
     mode = 'two_inputs'
 else:
@@ -46,11 +47,11 @@ else:
 
 # dir_test = os.path.normpath('../sakaka_data/buildings/valid/sat/')  # '../../data/mass_buildings/valid/'
 dir_nokia = os.path.normpath('../data/val/nokia_mask')
-dir_test = os.path.normpath('../data/val/sat_2/z18')  # '../../data/mass_buildings/valid/'
+dir_test = os.path.normpath('../data/test_whole_Mecca/sat_z18')  # '../../data/mass_buildings/valid/'
 files_names = sorted([f for f in os.listdir(dir_test) if isfile(join(dir_test, f))])
 # dir_test = os.path.normpath('/storage/_pdata/sakaka/satellite_images/raw_geotiffs/Area_Sakaka_Dawmat_Al_Jandal/')
 # output_folder = os.path.normpath('../sakaka_data/buildings/output/buildings_unet_128x128_epoch446_subpatch64_stepsize64/')
-output_folder = os.path.normpath('../output_data/Mecca_old_model')
+output_folder = os.path.normpath('../output_data/Mecca')
 ########################################################
 
 # TEST ON ALL IMAGES IN THE TEST DIRECTORY
@@ -126,12 +127,11 @@ for i, f_sat in enumerate(files_names):  # valid_sat_files
     map_pred = map_pred[0:img_size[0], 0:img_size[1]]
     logging.debug('raw (imgsize) map_pred.shape: {}'.format(map_pred.shape))
 
-    if True:
+    if False:
         save_mask_and_im_overlayer(img_sat, map_pred, save_output_path='overlay_test_{}.tif'.format(i))
-        map_pred = (map_pred * 255).astype(np.uint8)
-        map_pred[map_pred < 76] = 0
-        map_pred[map_pred >= 76] = 255
-
+        # map_pred = (map_pred * 255).astype(np.uint8)
+        # map_pred[map_pred < 76] = 0
+        # map_pred[map_pred >= 76] = 255
         just_show_numpy_as_image(map_pred, type='Black', name='map_pred_{}.tif'.format(i))
         # 1 / 0
 
