@@ -16,4 +16,5 @@ https://dmitriidenisov.github.io/area_assessment/mecca_demo/area_assesment.html
 
 Demo of second version:
 http://35.208.27.233:5555/map prod
+
 http://35.208.27.233:5556/map dev
