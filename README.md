@@ -33,7 +33,7 @@ https://youtu.be/DETdbaptB44
 
 ### Photos:
 <p align="center">
-  <img src="https://i.ibb.co/CbZ334P/Screen-Shot-2019-10-10-at-01-31-22.png" width="900" alt="accessibility text">
+  <img src="https://i.ibb.co/fv5fTkM/Screen-Shot-2019-10-10-at-01-33-00.png" width="900" alt="accessibility text">
 </p>
 
 <p align="center">
