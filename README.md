@@ -31,7 +31,7 @@ https://youtu.be/dku5B1yJEVY
 Mobile:
 https://youtu.be/DETdbaptB44
 
-### Photos:
+### Screenshots:
 <p align="center">
   <img src="https://i.ibb.co/fv5fTkM/Screen-Shot-2019-10-10-at-01-33-00.png" width="900" alt="accessibility text">
 </p>
