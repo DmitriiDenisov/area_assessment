@@ -37,9 +37,9 @@ https://youtu.be/DETdbaptB44
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/q01zxXq/Screen-Shot-2019-10-10-at-01-31-35.png" width="900" alt="accessibility text">
+  <img src="https://i.ibb.co/hX8kChQ/Screen-Shot-2019-10-10-at-01-31-35.png" width="900" alt="accessibility text">
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/Sr8bZtN/Screen-Shot-2019-10-10-at-01-33-00.png" width="900" alt="accessibility text">
+  <img src="https://i.ibb.co/PcnvvJD/Screen-Shot-2019-10-10-at-01-31-22.png" width="900" alt="accessibility text">
 </p>
