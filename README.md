@@ -26,9 +26,7 @@ http://35.208.27.233:5556/map dev
 
 ### Demo (video):
 Desktop:
-
 https://youtu.be/dku5B1yJEVY
 
 Mobile:
-
 https://youtu.be/DETdbaptB44
