@@ -1,8 +1,13 @@
 # area_assessment
 
 ###
-![demo area assesment desktop](https://media.giphy.com/media/Q7j2wUNKvR2hXfb0Vd/giphy.gif)
+![demo area assesment desktop](https://media.giphy.com/media/cPHRdYuWdXOW6AtYjd/giphy.gif)
 
+
+
+<p align="center">
+  <img src="https://media.giphy.com/media/cPHRdYuWdXOW6AtYjd/giphy.gif" width="600" alt="accessibility text">
+</p>
 
 <p align="center">
   <img src="https://media.giphy.com/media/Q7j2wUNKvR2hXfb0Vd/giphy.gif" width="600" alt="accessibility text">
