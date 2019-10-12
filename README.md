@@ -2,6 +2,10 @@
 
 ###
 <p align="center">
+  <img src="https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
   <img src="https://media.giphy.com/media/lPivyfMJs9K348G8qf/giphy.gif" width="900" alt="accessibility text">
 </p>
 
