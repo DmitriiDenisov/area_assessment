@@ -3,24 +3,9 @@
 ###
 
 <p align="center">
-  <img src="https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif" width="400" alt="accessibility text">
+  <img src="https://media.giphy.com/media/RhGEezlRICN3pm84ij/giphy.gif" width="600" alt="accessibility text">
 </p>
 
-<p align="center">
-  <img src="https://media.giphy.com/media/lPivyfMJs9K348G8qf/giphy.gif" width="400" alt="accessibility text">
-</p>
-
-<p align="center">
-  <img src="https://media.giphy.com/media/RhGEezlRICN3pm84ij/giphy.gif" width="400" alt="accessibility text">
-</p>
-
-<p align="center">
-  <img src="https://i.makeagif.com/media/10-12-2019/iZsEJz.gif" width="400" alt="accessibility text">
-</p>
-
-<p align="center">
-  <img src="https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif" width="400" alt="accessibility text">
-</p>
 
 
 ### Install GDAL library:
