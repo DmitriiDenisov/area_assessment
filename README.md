@@ -9,7 +9,9 @@
   <img src="https://media.giphy.com/media/RhGEezlRICN3pm84ij/giphy.gif" width="900" alt="accessibility text">
 </p>
 
-![demo area assesment desktop](https://i.makeagif.com/media/10-12-2019/iZsEJz.gif)
+<p align="center">
+  <img src="https://i.makeagif.com/media/10-12-2019/iZsEJz.gif" width="900" alt="accessibility text">
+</p>
 
 
 
