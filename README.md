@@ -1,7 +1,7 @@
 # area_assessment
 
 ###
-![demo area assesment desktop](https://i.makeagif.com/media/10-12-2019/9393Lu.gif)
+![demo area assesment desktop](https://media.giphy.com/media/Q7j2wUNKvR2hXfb0Vd/giphy.gif)
 
 
 ![Alt Text](https://i.makeagif.com/media/10-12-2019/1XWzpw.gif)
