@@ -1,5 +1,10 @@
 # area_assessment
 
+###
+<p align="center">
+  <img src="https://gph.is/g/Znxm2vK" width="900" alt="accessibility text">
+</p>
+
 
 ### Install GDAL library:
 Install Gdal library (on Ubuntu): 
