@@ -5,6 +5,8 @@
   <img src="https://gph.is/g/Znxm2vK" width="900" alt="accessibility text">
 </p>
 
+<img src="https://gph.is/g/Znxm2vK" width="40" height="40" />
+
 
 ### Install GDAL library:
 Install Gdal library (on Ubuntu): 
