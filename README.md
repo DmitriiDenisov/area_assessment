@@ -4,15 +4,6 @@
 ![demo area assesment desktop](https://media.giphy.com/media/Q7j2wUNKvR2hXfb0Vd/giphy.gif)
 
 
-![Alt Text](https://i.makeagif.com/media/10-12-2019/1XWzpw.gif)
-
-![demo area assesment desktop](https://i.makeagif.com/media/10-12-2019/1XWzpw.gif)
-
-![teamwork-cat-dog](https://i.makeagif.com/media/10-12-2019/1XWzpw.gif)
-
-<p align="center">
-  <img src="https://media.giphy.com/media/RhGEezlRICN3pm84ij/giphy.gif" width="600" alt="accessibility text">
-</p>
 
 
 
