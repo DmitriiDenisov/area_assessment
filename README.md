@@ -4,6 +4,14 @@
 ![demo area assesment desktop](https://media.giphy.com/media/Q7j2wUNKvR2hXfb0Vd/giphy.gif)
 
 
+<p align="center">
+  <img src="https://media.giphy.com/media/Q7j2wUNKvR2hXfb0Vd/giphy.gif" width="600" alt="accessibility text">
+</p>
+
+
+<p align="center">
+  <img src="https://media.giphy.com/media/RhGEezlRICN3pm84ij/giphy.gif" width="600" alt="accessibility text">
+</p>
 
 
 
