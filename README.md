@@ -17,6 +17,7 @@
   <img src="https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif" width="900" alt="accessibility text">
 </p>
 
+![demo area assesment desktop](https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif)
 
 
 ### Install GDAL library:
