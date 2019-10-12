@@ -2,7 +2,7 @@
 
 ###
 <p align="center">
-  <img src="https://gph.is/g/Znxm2vK" width="900" alt="accessibility text">
+  <img src="https://media.giphy.com/media/lPivyfMJs9K348G8qf/giphy.gif" width="900" alt="accessibility text">
 </p>
 
 <img src="https://gph.is/g/Znxm2vK" width="40" height="40" />
