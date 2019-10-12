@@ -2,16 +2,6 @@
 
 ###
 
--![Sample Gif](https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif)
-
-+<img src="/art/sample.gif?raw=true" width="200px">
-
-
-
-![b](https://i.makeagif.com/media/10-12-2019/iZsEJz.gif)
-
-![a](https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif)
-
 <p align="center">
   <img src="https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif" width="400" alt="accessibility text">
 </p>
@@ -31,8 +21,6 @@
 <p align="center">
   <img src="https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif" width="400" alt="accessibility text">
 </p>
-
-![demo area assesment desktop](https://i.makeagif.com/media/10-12-2019/DqxrJQ.gif)
 
 
 ### Install GDAL library:
