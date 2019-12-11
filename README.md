@@ -49,3 +49,8 @@ https://youtu.be/DETdbaptB44
 <p align="center">
   <img src="https://i.ibb.co/PcnvvJD/Screen-Shot-2019-10-10-at-01-31-22.png" width="900" alt="accessibility text">
 </p>
+
+
+### Statistics and additional information:
+
+May be found in this repository in releases
