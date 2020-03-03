@@ -12,7 +12,9 @@ First of all it reads `geojson_path` file and converts coordinates from P4326 to
 2. **Train model**. `scripts/train.py`: calls `DataGeneratorCustom` from `area_assessment/neural_networks/DataGeneratorCustom` which reads every image from folder with sat images (default `../data/train/sat`) and corresponding masks which we obtained on previous step. For every image DataGeneratorCustom makes: 
 
 -Cut of an image by patches of 128x128
+
 -Makes three rotations: 90, 180 and 270 degrees
+
 -Shuffles all dataset and yeilds them one by one with batch_size
 
 3. **Predict with model**. `scripts/predict.py`, for every image it makes following procedure:
@@ -30,6 +32,9 @@ First of all it reads `geojson_path` file and converts coordinates from P4326 to
 
 -Writes Heatmap to `output_folder` with geo data inside
 
+4. **To shp files**. `area_assesment/geo/geotiff_to_shp_file.py`. After we made a prediction we need to prepare special file which we will upload to ArcGIS to see the layer there. For this purpose this script reads images from `src_dir` and creates special files for ArcGIS system in `dst_dir`. `m_thre` is parameter of threshold 
+
+5. **Upload to ArcGIS**. Last step is to take `area_assessment\output_data\Mecca\shp` folder, zip it and upload this file to ArcGIS online
 
 ### Demo (live): 
 
