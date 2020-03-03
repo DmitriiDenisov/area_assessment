@@ -59,6 +59,10 @@ https://youtu.be/dku5B1yJEVY
 Mobile:
 https://youtu.be/DETdbaptB44
 
+### Development:
+Models, data, gdal library and area_assessment repo is on `instance-1` server
+Frontnd application in docker is stored on `front-area-assessment` server
+
 ### Statistics and additional information:
 
 May be found in this repository in releases
