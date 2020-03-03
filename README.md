@@ -61,7 +61,8 @@ https://youtu.be/DETdbaptB44
 
 ### Development:
 Models, data, gdal library and area_assessment repo is on `instance-1` server
-Frontnd application in docker is stored on `front-area-assessment` server
+
+Frontend application in docker is stored on `front-area-assessment` server
 
 ### Statistics and additional information:
 
