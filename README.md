@@ -6,6 +6,19 @@
   <img src="https://media.giphy.com/media/cPHRdYuWdXOW6AtYjd/giphy.gif" width="600" alt="accessibility text">
 </p>
 
+### Screenshots:
+<p align="center">
+  <img src="https://i.ibb.co/fv5fTkM/Screen-Shot-2019-10-10-at-01-33-00.png" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
+  <img src="https://i.ibb.co/hX8kChQ/Screen-Shot-2019-10-10-at-01-31-35.png" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
+  <img src="https://i.ibb.co/PcnvvJD/Screen-Shot-2019-10-10-at-01-31-22.png" width="900" alt="accessibility text">
+</p>
+
 ### Instructions:
 0. **Create dataset**. With SAS.Planet (SAS.Планета) parse high resolution images. Recommendation is to use zoom 18, because >18 is too delatiled and <18 is not enough. With ArcGIS Online create geojson with coordinates of buildings
 1. **Create masks for sat images** `area_assessment/make_train_masks.py`: script reads files from `source_dir` (default: `../../data/train/sat`). For each image from `source_dir` this script makes corresponding binary mask image in `target_dir` (default `../../data/train/map`). In order to make it script takes as input `geojson_path` variable (default: `../../data/train/NN_predict_0_geojson_1.geojson`)
@@ -45,20 +58,6 @@ https://youtu.be/dku5B1yJEVY
 
 Mobile:
 https://youtu.be/DETdbaptB44
-
-### Screenshots:
-<p align="center">
-  <img src="https://i.ibb.co/fv5fTkM/Screen-Shot-2019-10-10-at-01-33-00.png" width="900" alt="accessibility text">
-</p>
-
-<p align="center">
-  <img src="https://i.ibb.co/hX8kChQ/Screen-Shot-2019-10-10-at-01-31-35.png" width="900" alt="accessibility text">
-</p>
-
-<p align="center">
-  <img src="https://i.ibb.co/PcnvvJD/Screen-Shot-2019-10-10-at-01-31-22.png" width="900" alt="accessibility text">
-</p>
-
 
 ### Statistics and additional information:
 
