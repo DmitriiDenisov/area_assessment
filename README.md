@@ -13,13 +13,13 @@ First of all it reads `geojson_path` file and converts coordinates from P4326 to
 
 - Cut of an image by patches of 128x128
 - Makes three rotations: 90, 180 and 270 degrees
-- Shuffles all dataset and yeilds them one by one with batch_size
+- Shuffles all dataset and yields them one by one with batch_size
 
 3. **Predict with model**. `scripts/predict.py`, for every image it makes following procedure:
 - Reads sat image from `dir_test` (default `../data/test_whole_Mecca/sat_z18`)
-- Makes upscaling for it because our prediction is always 128x128, for some images the width/height may not devide completely
+- Makes upscaling for it because our prediction is always 128x128, for some images the width/height may not divide completely
 - Splits every image with sliding window of 128x128 and using parameter `step_size` which is default is 64
-- Predicts for array of pathces with loaded model from `MODEL_PATH`
+- Predicts for array of patches with loaded model from `MODEL_PATH`
 - Returns patches back to image meanwhile also normalizing those pixels where there was overlapping for a model
 - Cut the image back to initial sizes because as first step we did upscaling
 - Writes Heatmap to `output_folder` with geo data inside
