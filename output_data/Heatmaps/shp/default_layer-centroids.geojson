@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "default_layer_centroids",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3785" } },
+"features": [
+
+]
+}
